@@ -160,6 +160,7 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
         self.dataFrame = None
         self.curPointsPlottedX = None
         self.curPointsPlottedY = None
+        self.oneWindow = None
 
         self.continueButton.clicked.connect(self.continueToRfAnalysis)
         self.backButton.clicked.connect(self.backToLastScreen)
@@ -211,6 +212,8 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
             self.previewFrameMesh.setPixmap(QPixmap.fromImage(self.qImgMesh).scaled(self.widthScale, self.depthScale))
 
     def plotRoiPreview(self):
+        if self.oneWindow != None:
+            return
         self.waveLength = self.axWinSizeVal.value()/10
 
         self.minX = min(self.finalSplineX)
@@ -280,7 +283,7 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
 
     def continueToRfAnalysis(self):
         del self.rfAnalysisGUI
-        self.rfAnalysisGUI = RfAnalysisGUI(self.finalSplineX, self.finalSplineY)
+        self.rfAnalysisGUI = RfAnalysisGUI(self.finalSplineX, self.finalSplineY, ow=self.oneWindow)
         self.rfAnalysisGUI.imgDataStruct = self.lastGui.imgDataStruct
         self.rfAnalysisGUI.imgInfoStruct = self.lastGui.imgInfoStruct
         self.rfAnalysisGUI.refDataStruct = self.lastGui.refDataStruct
