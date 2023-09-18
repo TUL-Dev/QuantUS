@@ -1053,7 +1053,7 @@ QPushButton:checked {
    <property name="geometry">
     <rect>
      <x>630</x>
-     <y>140</y>
+     <y>110</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -1081,7 +1081,7 @@ QPushButton:checked {
    <property name="geometry">
     <rect>
      <x>890</x>
-     <y>140</y>
+     <y>110</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -1109,7 +1109,7 @@ QPushButton:checked {
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>140</y>
+     <y>110</y>
      <width>251</width>
      <height>41</height>
     </rect>
