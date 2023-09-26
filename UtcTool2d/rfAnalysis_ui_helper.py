@@ -20,7 +20,7 @@ system = platform.system()
 
 
 class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
-    def __init__(self, splineX, splineY):
+    def __init__(self, splineX, splineY, ow = None): #ow = oneWindow
         super().__init__()
         self.setupUi(self)
 
@@ -221,6 +221,8 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
         self.editImageDisplayGUI = EditImageDisplayGUI()
         self.editImageDisplayButton.clicked.connect(self.openImageEditor)
 
+        self.oneWindow = ow
+
         self.chooseWindowButton.setCheckable(True)
         self.displayMbfButton.setCheckable(True)
         self.displaySiButton.setCheckable(True)
@@ -230,9 +232,9 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
         self.displaySsButton.clicked.connect(self.ssChecked)
         self.displaySiButton.clicked.connect(self.siChecked)
         self.chooseWindowButton.clicked.connect(self.chooseWindow)
-        self.editImageDisplayGUI.contrastVal.valueChanged.connect(self.changeContrast)
-        self.editImageDisplayGUI.brightnessVal.valueChanged.connect(self.changeBrightness)
-        self.editImageDisplayGUI.sharpnessVal.valueChanged.connect(self.changeSharpness)
+        # self.editImageDisplayGUI.contrastVal.valueChanged.connect(self.changeContrast)
+        # self.editImageDisplayGUI.brightnessVal.valueChanged.connect(self.changeBrightness)
+        # self.editImageDisplayGUI.sharpnessVal.valueChanged.connect(self.changeSharpness)
         self.editImageDisplayGUI.contrastVal.setValue(1)
         self.editImageDisplayGUI.brightnessVal.setValue(1)
         self.editImageDisplayGUI.sharpnessVal.setValue(1)
@@ -357,7 +359,8 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
         self.ax.imshow(im, cmap='Greys_r')
         self.ax.axis('off')
 
-        self.ax.plot(self.splineX, self.splineY, color = "cyan", zorder=1, linewidth=0.75)
+        if self.oneWindow == None:
+            self.ax.plot(self.splineX, self.splineY, color = "cyan", zorder=1, linewidth=0.75)
         self.figure.subplots_adjust(left=0,right=1, bottom=0,top=1, hspace=0.2,wspace=0.2)
         self.cursor = matplotlib.widgets.Cursor(self.ax, color="gold", linewidth=0.4, useblit=True)
         self.cursor.set_active(False)
@@ -417,6 +420,14 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
     def computeROIWindows(self): 
         # Compute ROI windows
         global scanConverted
+        if self.oneWindow != None:
+            self.roiWindowSplinesStruct = RoiPositionsStruct()
+            self.roiWindowSplinesStruct.left = [self.oneWindow[0]]
+            self.roiWindowSplinesStruct.right = [self.oneWindow[1]]
+            self.roiWindowSplinesStruct.top = [self.oneWindow[2]]
+            self.roiWindowSplinesStruct.bottom = [self.oneWindow[3]]
+            self.roiWindowSplinesStructPreSC = self.roiWindowSplinesStruct
+            return
         try:
             self.roiWindowSplinesStruct, self.roiWindowSplinesStructPreSC = roiWindowsGenerator(self.splineX, self.splineY, self.imgDataStruct.scBmode.shape[0], self.imgDataStruct.scBmode.shape[1], self.axialWinSize, self.lateralWinSize, self.imgInfoStruct.axialRes, self.imgInfoStruct.lateralRes, self.axialOverlap, self.lateralOverlap, self.windowThreshold, self.imgDataStruct.scRF.xmap, self.imgDataStruct.scRF.ymap)
             scanConverted = False
@@ -431,8 +442,9 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
             scanConverted = True
 
     def displayROIWindows(self):
-        self.splineX = np.clip(self.splineX, a_min=0, a_max=self.cvIm.width)
-        self.splineY = np.clip(self.splineY, a_min=0, a_max=self.cvIm.height)
+        if self.oneWindow == None:
+            self.splineX = np.clip(self.splineX, a_min=0, a_max=self.cvIm.width)
+            self.splineY = np.clip(self.splineY, a_min=0, a_max=self.cvIm.height)
         self.computeROIWindows()
         if len(self.roiWindowSplinesStruct.left) > 0:
             global roisLeft, roisRight, roisTop, roisBottom

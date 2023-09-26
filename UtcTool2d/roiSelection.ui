@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1175</width>
-    <height>749</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -743,9 +743,9 @@ QPushButton:checked {
   <widget class="QPushButton" name="loadRoiButton">
    <property name="geometry">
     <rect>
-     <x>820</x>
+     <x>890</x>
      <y>110</y>
-     <width>271</width>
+     <width>251</width>
      <height>41</height>
     </rect>
    </property>
@@ -771,9 +771,9 @@ QPushButton:checked {
   <widget class="QPushButton" name="newRoiButton">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>370</x>
      <y>110</y>
-     <width>271</width>
+     <width>251</width>
      <height>41</height>
     </rect>
    </property>
@@ -1172,6 +1172,159 @@ QPushButton:checked {
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QPushButton" name="acceptRectButton">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>110</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Accept Rectangle</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="drawRectButton">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>110</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+QPushButton:checked {
+	color:white; 
+	font-size: 16px;
+	background: rgb(45, 0, 110);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Draw Rectangle</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="redrawRectButton">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>110</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Redo Rectangle</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="rectRoiButton">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>110</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Rectangle ROI</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <zorder>constructRoiLabel</zorder>
+  <zorder>drawRoiButton</zorder>
+  <zorder>undoLastPtButton</zorder>
+  <zorder>acceptRoiButton</zorder>
+  <zorder>sidebar</zorder>
+  <zorder>analysisParamsSidebar</zorder>
+  <zorder>editImageDisplayButton</zorder>
+  <zorder>closeRoiButton</zorder>
+  <zorder>redrawRoiButton</zorder>
+  <zorder>backButton</zorder>
+  <zorder>curFrameSlider</zorder>
+  <zorder>curFrameLabel</zorder>
+  <zorder>ofFramesLabel</zorder>
+  <zorder>totalFramesLabel</zorder>
+  <zorder>imDisplayFrame</zorder>
+  <zorder>imMaskFrame</zorder>
+  <zorder>imCoverFrame</zorder>
+  <zorder>loadRoiButton</zorder>
+  <zorder>newRoiButton</zorder>
+  <zorder>acceptLoadedRoiButton</zorder>
+  <zorder>undoLoadedRoiButton</zorder>
+  <zorder>physicalDimsLabel</zorder>
+  <zorder>physicalWidthLabel</zorder>
+  <zorder>physicalDepthLabel</zorder>
+  <zorder>physicalWidthVal</zorder>
+  <zorder>physicalDepthVal</zorder>
+  <zorder>pixelDepthLabel</zorder>
+  <zorder>pixelWidthLabel</zorder>
+  <zorder>pixelDepthVal</zorder>
+  <zorder>pixelDimsLabel</zorder>
+  <zorder>pixelWidthVal</zorder>
+  <zorder>acceptRectButton</zorder>
+  <zorder>drawRectButton</zorder>
+  <zorder>rectRoiButton</zorder>
+  <zorder>redrawRectButton</zorder>
  </widget>
  <resources/>
  <connections/>

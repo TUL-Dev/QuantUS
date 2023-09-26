@@ -106,6 +106,9 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.undoLastPtButton.setHidden(True)
         self.redrawRoiButton.setHidden(True)
         self.acceptRoiButton.setHidden(True)
+        self.drawRectButton.setHidden(True)
+        self.redrawRectButton.setHidden(True)
+        self.acceptRectButton.setHidden(True)
         self.undoLoadedRoiButton.setHidden(True)
         self.acceptLoadedRoiButton.setHidden(True)
         self.acceptLoadedRoiButton.clicked.connect(self.acceptROI)
@@ -142,6 +145,11 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.backButton.clicked.connect(self.backToLastScreen)
         self.newRoiButton.clicked.connect(self.drawNewRoi)
         self.loadRoiButton.clicked.connect(self.openLoadRoiWindow)
+
+        self.rectRoiButton.clicked.connect(self.drawRectRoi)
+        # self.drawRectButton.clicked.connect(self.recordDrawRectClicked)
+        self.redrawRectButton.clicked.connect(self.clearRect)
+        self.acceptRectButton.clicked.connect(self.acceptRect)
     
     def undoRoiLoad(self):
         self.undoLoadedRoiButton.setHidden(True)
@@ -158,11 +166,20 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
 
     def drawNewRoi(self):
         self.newRoiButton.setHidden(True)
+        self.rectRoiButton.setHidden(True)
         self.loadRoiButton.setHidden(True)
         self.drawRoiButton.setHidden(False)
         self.undoLastPtButton.setHidden(False)
         self.closeRoiButton.setHidden(False)
         self.acceptRoiButton.setHidden(False)
+    
+    def drawRectRoi(self):
+        self.newRoiButton.setHidden(True)
+        self.rectRoiButton.setHidden(True)
+        self.loadRoiButton.setHidden(True)
+        self.drawRectButton.setHidden(False)
+        self.redrawRectButton.setHidden(False)
+        self.acceptRectButton.setHidden(False)
 
     def backToLastScreen(self):
         self.lastGui.dataFrame = self.dataFrame
@@ -182,6 +199,18 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
             self.curPointsPlottedX.append(plotX)
             self.curPointsPlottedY.append(plotY)
             self.updateSpline()
+        elif self.drawRectButton.isChecked():
+            if self.xCur < self.xBorderMax and self.xCur > self.xBorderMin and self.yCur < self.yBorderMax and self.yCur > self.yBorderMin:
+                plotX = self.xCur - 401
+                plotY = self.yCur - 171
+            else:
+                return
+            if len(self.curPointsPlottedX) < 2:
+                self.curPointsPlottedX.append(int(plotX))
+                self.curPointsPlottedY.append(int(plotY))
+                self.updateRect()
+
+            self.plotOnCanvas()
 
     def updateSpline(self):
         self.maskCoverImg.fill(0)
@@ -195,6 +224,35 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
                 ySpline = np.clip(ySpline, a_min=round(self.yBorderMin - 170)+1, a_max=500 + round(self.yBorderMax - 671))
                 for i in range(len(xSpline)):
                     self.maskCoverImg[ySpline[i]-1:ySpline[i]+2, xSpline[i]-1:xSpline[i]+2] = [255, 255, 0, 255]
+
+            for i in range(len(self.curPointsPlottedX)):
+                self.maskCoverImg[self.curPointsPlottedY[i]-2:self.curPointsPlottedY[i]+3, \
+                                    self.curPointsPlottedX[i]-2:self.curPointsPlottedX[i]+3] = [0,0,255, 255]
+
+        self.plotOnCanvas()
+        # self.updateCrosshair()
+    
+    def updateRect(self):
+        self.maskCoverImg.fill(0)
+        if len(self.curPointsPlottedX) > 0:            
+            if len(self.curPointsPlottedX) > 1:
+                if self.curPointsPlottedX[0] == self.curPointsPlottedX[1]:
+                    self.curPointsPlottedX[1] += 1
+                if self.curPointsPlottedY[0] == self.curPointsPlottedY[1]:
+                    self.curPointsPlottedY[1] += 1
+                # rectXs = [min(self.curPointsPlottedX), max(self.curPointsPlottedX), max(self.curPointsPlottedX), min(self.curPointsPlottedX), min(self.curPointsPlottedX)]
+                # rectYs = [min(self.curPointsPlottedY), min(self.curPointsPlottedY), max(self.curPointsPlottedY), max(self.curPointsPlottedY), min(self.curPointsPlottedY)]
+                min_x = min(self.curPointsPlottedX)
+                max_x = max(self.curPointsPlottedX)
+                min_y = min(self.curPointsPlottedY)
+                max_y = max(self.curPointsPlottedY)
+                for x in range(min_x, max_x + 1):
+                    self.maskCoverImg[min_y, x] = [0, 255, 255, 255]
+                    self.maskCoverImg[max_y, x] = [0, 255, 255, 255]
+
+                for y in range(min_y, max_y + 1):
+                    self.maskCoverImg[y, min_x] = [0, 255, 255, 255]
+                    self.maskCoverImg[y, max_x] = [0, 255, 255, 255]
 
             for i in range(len(self.curPointsPlottedX)):
                 self.maskCoverImg[self.curPointsPlottedY[i]-2:self.curPointsPlottedY[i]+3, \
@@ -479,6 +537,79 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
             self.maskCoverImg.fill(0)
             self.plotOnCanvas()
             self.update()
+    
+    # def recordDrawRectClicked(self):
+    #     if self.drawRectButton.isChecked(): # Set up b-mode to be drawn on
+    #         # image, =self.ax.plot([], [], marker="o",markersize=3, markerfacecolor="red")
+    #         # self.cid = image.figure.canvas.mpl_connect('button_press_event', self.interpolatePoints)
+    #         self.cid = self.figure.canvas.mpl_connect('button_press_event', self.addRectPoint)
+    #         self.cursor.set_active(True)
+    #     else: # No longer let b-mode be drawn on
+    #         self.cid = self.figure.canvas.mpl_disconnect(self.cid)
+    #         self.cursor.set_active(False)
+    #     self.canvas.draw()
+
+    # def addRectPoint(self, event):
+    #     try:
+    #         if self.imgInfoStruct.numSamplesDrOut == 1400:
+    #             # Preset 1 boundaries for 20220831121844_IQ.bin
+    #             leftSlope = (500 - 0)/(154.22 - 148.76)
+    #             pointSlopeLeft = (event.ydata - 0) / (event.xdata - 148.76)
+    #             if pointSlopeLeft <= 0 or leftSlope < pointSlopeLeft:
+    #                 return
+
+    #             bottomSlope = (386.78 - 358.38) / (716 - 0)
+    #             pointSlopeBottom = (event.ydata - 358.38) / (event.xdata - 0)
+    #             rightSlope = (500 - 0) / (509.967 - 572.47)
+    #             pointSlopeRight = (event.ydata - 0) / (event.xdata - 572.47)
+
+    #         elif self.imgInfoStruct.numSamplesDrOut == 1496:
+    #             # Preset 2 boundaries for 20220831121752_IQ.bin
+    #             leftSlope = (500 - 0) / (120.79 - 146.9)
+    #             pointSlopeLeft = (event.ydata - 0) / (event.xdata - 146.9)
+    #             if pointSlopeLeft > leftSlope and pointSlopeLeft <= 0:
+    #                 return
+
+    #             bottomSlope = (500 - 462.41) / (644.76 - 0)
+    #             pointSlopeBottom = (event.ydata - 462.41) / (event.xdata - 0)
+    #             rightSlope = (500 - 0) / (595.84 - 614.48)
+    #             pointSlopeRight = (event.ydata - 0) / (event.xdata - 614.48)
+
+    #         else:
+    #             print("Preset not found!")
+    #             return
+
+    #         if pointSlopeBottom > bottomSlope:
+    #                 return
+    #         if pointSlopeRight >= 0 or pointSlopeRight < rightSlope:
+    #             return
+    #     except:
+    #         pass
+
+    #     self.pointsPlottedX.append(int(event.xdata))
+    #     self.pointsPlottedY.append(int(event.ydata))
+    #     self.scatteredPoints.append(self.ax.scatter(self.pointsPlottedX[-1], self.pointsPlottedY[-1], marker="o", s=0.5, c="red", zorder=500))
+
+    #     assert(len(self.pointsPlottedX) == len(self.pointsPlottedY))
+
+    #     if len(self.pointsPlottedX) == 1:
+    #         pass
+    #     elif len(self.pointsPlottedX) == 2:
+    #         self.closeRect()
+    #     else:
+    #         print("Whoops, wrong number of rectangle points. This shouldn't have happened.")
+    #         assert(False)
+
+    #     self.canvas.draw()
+
+    def clearRect(self):
+        self.curPointsPlottedX = []
+        self.curPointsPlottedY = []
+        self.scatteredPoints = []
+        self.drawRectButton.setChecked(False)
+        self.drawRectButton.setCheckable(True)
+        self.undoLastPtButton.clicked.connect(self.undoLastPt)
+        self.plotOnCanvas()
 
     def acceptROI(self):
         if len(self.curPointsPlottedX) > 1 and self.curPointsPlottedX[-1] == self.curPointsPlottedX[0]:
@@ -530,6 +661,44 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
             self.analysisParamsGUI.plotRoiPreview()
             self.analysisParamsGUI.show()
             self.hide()
+    
+    def acceptRect(self):
+        if not len(self.curPointsPlottedX) == 2 and len(self.curPointsPlottedY) == 2:
+            print("Can't accept because wrong number of points.")
+            assert(False)
+        if self.curPointsPlottedX[0] == self.curPointsPlottedX[1]:
+            self.curPointsPlottedX[1] += 1
+        if self.curPointsPlottedY[0] == self.curPointsPlottedY[1]:
+            self.curPointsPlottedY[1] += 1
+        
+        del self.analysisParamsGUI
+
+        if self.multipleFrames:
+            imData = np.array(self.imArray[self.frame]).reshape(self.arHeight, self.arWidth)
+        else:
+            imData = self.imArray
+        imData = np.flipud(imData)
+        imData = np.require(imData, np.uint8, 'C')
+        bytesLine = imData.strides[0]
+        arHeight = imData.shape[0]
+        arWidth = imData.shape[1]
+        savedIm = QImage(imData, arWidth, arHeight, bytesLine, QImage.Format_Grayscale8).scaled(self.widthScale, self.depthScale)
+
+        savedIm.mirrored().save(os.path.join("Junk", "bModeImRaw.png"))
+        savedIm.mirrored().save(os.path.join("Junk", "bModeIm.png"))
+        self.analysisParamsGUI = AnalysisParamsGUI()
+
+        self.analysisParamsGUI.oneWindow = [min(self.curPointsPlottedX), max(self.curPointsPlottedX), min(self.curPointsPlottedY), max(self.curPointsPlottedY)]        
+        self.analysisParamsGUI.curPointsPlottedX = self.curPointsPlottedX[:-1]
+        self.analysisParamsGUI.curPointsPlottedY = self.curPointsPlottedY[:-1]
+        self.analysisParamsGUI.lastGui = self
+        self.analysisParamsGUI.imArray = self.imData
+        self.analysisParamsGUI.dataFrame = self.dataFrame
+        self.analysisParamsGUI.setFilenameDisplays(self.imagePathInput.text().split('/')[-1], self.phantomPathInput.text().split('/')[-1])
+        self.analysisParamsGUI.plotRoiPreview()
+        self.analysisParamsGUI.show()
+        # self.editImageDisplayGUI.hide()
+        self.hide()
 
 def calculateSpline(xpts, ypts): # 2D spline interpolation
     cv = []
