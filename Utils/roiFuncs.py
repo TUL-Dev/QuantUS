@@ -246,7 +246,7 @@ def computeSpecWindowsIQ(
 def computeSpecWindows(
     imgRF, refRF, top, bottom, left, right,
     minFrequency, maxFrequency, imgLowBandFreq, imgUpBandFreq,
-    imgSamplingFreq, frame
+    imgSamplingFreq, frame, phantName=None
 ):
 
     # Set some flags
@@ -289,7 +289,10 @@ def computeSpecWindows(
             refWindow = refRF[top[i]:bottom[i],left[i]:right[i]]
         else:
             imgWindow = imgRF[frame,top[i]:bottom[i],left[i]:right[i]]
-            refWindow = refRF[frame,top[i]:bottom[i],left[i]:right[i]]
+            if phantName == 'uri_SpV2232_VpF512_FpA90_20210129103529.rfd':
+                refWindow = refRF[top[i]:bottom[i], left[i]:right[i]]
+            else:
+                refWindow = refRF[frame,top[i]:bottom[i],left[i]:right[i]]
 
         [f, ps] = computePowerSpec(imgWindow, f0, f1, fs) # initially had round(img_gain), but since not used in function, we left it out
         [f, rPS] = computePowerSpec(refWindow, f0, f1, fs) # Same as above, except for round(ref_gain)

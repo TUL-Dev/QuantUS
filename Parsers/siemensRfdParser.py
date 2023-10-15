@@ -380,10 +380,14 @@ def getData(Files, RefFiles):
 def readFileImg(Info, focus):
     file_obj = open(str(Info.filepath+Info.filename), 'rb')
     FileHeader = readHeader(str(Info.filepath+Info.filename))
-    data = np.zeros([len(FileHeader.idx1.frame), int(FileHeader.rfbd.numSamplesPerVector-FileHeader.strf.vectorHeaderLengthBytes/2), \
-                    int(FileHeader.csh0.numVectorsPerStreamFrame)]).astype(np.int16)
-    for frame in range(len(FileHeader.idx1.frame)):
-        [data[frame], _]  = extractFrameData(file_obj, FileHeader, frame)
+    if Info.filename == 'uri_SpV2232_VpF512_FpA90_20210129103529.rfd':
+        # Custom phantom optimization for Thyroid project
+        data = extractFrameData(file_obj, FileHeader, 51)
+    else:
+        data = np.zeros([len(FileHeader.idx1.frame), int(FileHeader.rfbd.numSamplesPerVector-FileHeader.strf.vectorHeaderLengthBytes/2), \
+                        int(FileHeader.csh0.numVectorsPerStreamFrame)]).astype(np.int16)
+        for frame in range(len(FileHeader.idx1.frame)):
+            [data[frame], _]  = extractFrameData(file_obj, FileHeader, frame)
     echoData = splitData(data.astype(np.double), focus)
     
     bmode = np.zeros(echoData.shape).astype(np.int32)

@@ -39,7 +39,12 @@ class LoadRoiGUI(Ui_loadRoi, QWidget):
                         self.chooseRoiGUI.curPointsPlottedX = [int(num) for num in self.chooseRoiGUI.curPointsPlottedX]
                         self.chooseRoiGUI.curPointsPlottedY = row[2][1:-1].split(',')
                         self.chooseRoiGUI.curPointsPlottedY = [int(num) for num in self.chooseRoiGUI.curPointsPlottedY]
-                        self.chooseRoiGUI.frame = int(row[3])
+                        try:
+                            self.chooseRoiGUI.frame = int(row[3])
+                            self.chooseRoiGUI.curFrameSlider.setValue(self.chooseRoiGUI.frame)
+                            self.chooseRoiGUI.curFrameChanged()
+                        except:
+                            self.chooseRoiGUI.frame = None
                         break
                     line_count += 1
             if imageName != self.chooseRoiGUI.imagePathInput.text():
@@ -47,8 +52,6 @@ class LoadRoiGUI(Ui_loadRoi, QWidget):
                 self.chooseRoiGUI.curPointsPlottedY = []
                 print("Selected ROI for wrong image")
                 return
-            self.chooseRoiGUI.curFrameSlider.setValue(self.chooseRoiGUI.frame)
-            self.chooseRoiGUI.curFrameChanged()
             self.chooseRoiGUI.closeInterpolation()
             self.chooseRoiGUI.acceptLoadedRoiButton.setHidden(False)
             self.chooseRoiGUI.undoLoadedRoiButton.setHidden(False)

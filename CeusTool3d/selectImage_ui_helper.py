@@ -128,7 +128,7 @@ class SelectImageGUI_CeusTool3d(Ui_selectImage, QWidget):
             self.niftiImageDestinationPath.setText(fileName)
 
     def clearNiftiImageDestinationPath(self):
-        self.niftiImageDestinationButton.setText('')
+        self.niftiImageDestinationPath.setText('')
 
     def getXmlImageDestinationPath(self):
         fileName = QFileDialog.getExistingDirectory(None, 'Select Directory')

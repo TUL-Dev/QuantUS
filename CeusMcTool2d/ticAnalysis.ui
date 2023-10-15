@@ -547,103 +547,20 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="sagittalPlaneLabel">
+  <widget class="QLabel" name="imDisplayLabel">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>370</x>
      <y>80</y>
-     <width>271</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 18px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>B-Mode Image</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="mcBmodeDisplayLabel">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>120</y>
-     <width>231</width>
-     <height>211</height>
+     <width>771</width>
+     <height>261</height>
     </rect>
    </property>
    <property name="text">
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="mcCeDisplayLabel">
-   <property name="geometry">
-    <rect>
-     <x>810</x>
-     <y>120</y>
-     <width>231</width>
-     <height>211</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="ceCoverLabel">
-   <property name="geometry">
-    <rect>
-     <x>810</x>
-     <y>120</y>
-     <width>231</width>
-     <height>211</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	background-color: transparent;
-}</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="coronalPlaneLabel">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>80</y>
-     <width>271</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 18px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>Contrast-Enhanced Image</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <zorder>mcBmodeDisplayLabel</zorder>
+  <zorder>imDisplayLabel</zorder>
   <zorder>analysisParamsLabel_2</zorder>
   <zorder>selectT0Button</zorder>
   <zorder>sidebar</zorder>
@@ -657,10 +574,6 @@
   <zorder>acceptTicButton</zorder>
   <zorder>backButton</zorder>
   <zorder>bmodeCoverLabel</zorder>
-  <zorder>sagittalPlaneLabel</zorder>
-  <zorder>mcCeDisplayLabel</zorder>
-  <zorder>ceCoverLabel</zorder>
-  <zorder>coronalPlaneLabel</zorder>
  </widget>
  <resources/>
  <connections/>

@@ -276,16 +276,51 @@ def generate_TIC(window, bboxes, times, compression, pixelScale, refFrame):
             bool_mask = np.zeros(tmpwin.shape, dtype=bool)
             x0, y0, x_len, y_len = bboxes[t]
             for x in range(x_len):
-                bool_mask[x,y0] = True
-                bool_mask[x,y0+y_len] = True
+                bool_mask[y0,x] = True
+                bool_mask[y0+y_len, x] = True
             for y in range(y_len):
-                bool_mask[x0,y] = True
-                bool_mask[x0+x_len-1,y] = True
+                bool_mask[y, x0] = True
+                bool_mask[y, x0+x_len-1] = True
             bool_mask = binary_fill_holes(bool_mask)
             numPoints = len(np.where(bool_mask == True)[0])
             TIC.append(np.exp(tmpwin[bool_mask]/compression).mean()*pixelScale)
             TICtime.append(times[t])
             areas.append(pixelScale*numPoints)
+
+    TICz = np.array([TICtime, TIC]).astype('float64')
+    TICz = TICz.transpose()
+    TICz[:,1]=TICz[:,1]-np.mean(TICz[0:2,1])#Subtract noise in TIC before contrast
+    if TICz[np.nan_to_num(TICz)<0].any():#make the smallest number in TIC 0
+        TICz[:,1]=TICz[:,1]+np.abs(np.min(TICz[:,1]))
+    else:
+        TICz[:,1]=TICz[:,1]-np.min(TICz[:,1])
+    return TICz, np.round(np.mean(areas), decimals=2)
+
+def generate_TIC_no_TMPPV(window, bboxes, times, compression, refFrame):
+    TICtime = []
+    TIC = []
+    areas = []
+    for t in range(0, window.shape[0]):
+        if bboxes[t] != None:
+            tmpwin = window[t]
+            bool_mask = np.zeros(tmpwin.shape, dtype=bool)
+            x0, y0, x_len, y_len = bboxes[t]
+            if y0+y_len >= bool_mask.shape[0]:
+                y_len = bool_mask.shape[0] - y0 - 1
+            if x0+x_len >= bool_mask.shape[1]:
+                x_len = bool_mask.shape[0] - x0 - 1
+            bool_mask[y0:y0+y_len, x0:x0+x_len] = True
+            # for x in range(x_len):
+            #     bool_mask[y0,x] = True
+            #     bool_mask[y0+y_len, x] = True
+            # for y in range(y_len):
+            #     bool_mask[y, x0] = True
+            #     bool_mask[y, x0+x_len] = True
+            # bool_mask = binary_fill_holes(bool_mask)
+            numPoints = len(np.where(bool_mask == True)[0])
+            TIC.append(np.exp(tmpwin[bool_mask]/compression).mean())
+            TICtime.append(times[t])
+            areas.append(numPoints)
 
     TICz = np.array([TICtime, TIC]).astype('float64')
     TICz = TICz.transpose()

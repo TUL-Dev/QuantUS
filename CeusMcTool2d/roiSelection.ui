@@ -18,63 +18,11 @@
 	background: rgb(42, 42, 42);
 }</string>
   </property>
-  <widget class="QLabel" name="axialPlaneLabel">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>100</y>
-     <width>271</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 18px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>B-Mode</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="sagittalPlaneLabel">
-   <property name="geometry">
-    <rect>
-     <x>830</x>
-     <y>100</y>
-     <width>271</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 18px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>Contrast-Enhanced Image</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
   <widget class="QLabel" name="curSliceLabel">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>530</y>
+     <x>360</x>
+     <y>570</y>
      <width>361</width>
      <height>51</height>
     </rect>
@@ -105,8 +53,8 @@
   <widget class="QSlider" name="curSliceSlider">
    <property name="geometry">
     <rect>
-     <x>369</x>
-     <y>590</y>
+     <x>379</x>
+     <y>630</y>
      <width>191</width>
      <height>41</height>
     </rect>
@@ -118,8 +66,8 @@
   <widget class="QLabel" name="curSliceOfLabel">
    <property name="geometry">
     <rect>
-     <x>665</x>
-     <y>595</y>
+     <x>675</x>
+     <y>635</y>
      <width>41</width>
      <height>31</height>
     </rect>
@@ -144,8 +92,8 @@
   <widget class="QLabel" name="curSliceTotal">
    <property name="geometry">
     <rect>
-     <x>700</x>
-     <y>595</y>
+     <x>710</x>
+     <y>635</y>
      <width>61</width>
      <height>31</height>
     </rect>
@@ -470,26 +418,29 @@
     </property>
    </widget>
   </widget>
-  <widget class="QLabel" name="bmodePlane">
+  <widget class="QLabel" name="imPlane">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
+     <x>350</x>
+     <y>80</y>
+     <width>801</width>
+     <height>481</height>
     </rect>
    </property>
    <property name="text">
     <string/>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
   </widget>
-  <widget class="QLabel" name="bmodeMaskLayer">
+  <widget class="QLabel" name="imMaskLayer">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
+     <x>350</x>
+     <y>80</y>
+     <width>801</width>
+     <height>481</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -500,27 +451,17 @@
    <property name="text">
     <string/>
    </property>
-  </widget>
-  <widget class="QLabel" name="cePlane">
-   <property name="geometry">
-    <rect>
-     <x>770</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="mcBmodeDisplayLabel">
+  <widget class="QLabel" name="mcImDisplayLabel">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
+     <x>350</x>
+     <y>80</y>
+     <width>801</width>
+     <height>481</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -531,41 +472,8 @@
    <property name="text">
     <string/>
    </property>
-  </widget>
-  <widget class="QLabel" name="ceMaskLayer">
-   <property name="geometry">
-    <rect>
-     <x>770</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	background-color: transparent;
-}</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="mcCeDisplayLabel">
-   <property name="geometry">
-    <rect>
-     <x>770</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	background-color: transparent;
-}</string>
-   </property>
-   <property name="text">
-    <string/>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
   <widget class="QPushButton" name="backButton">
@@ -592,8 +500,8 @@
   <widget class="QSpinBox" name="curSliceSpinBox">
    <property name="geometry">
     <rect>
-     <x>620</x>
-     <y>600</y>
+     <x>630</x>
+     <y>640</y>
      <width>48</width>
      <height>24</height>
     </rect>
@@ -605,115 +513,11 @@
 }</string>
    </property>
   </widget>
-  <widget class="QLabel" name="curSliceOfLabel_2">
-   <property name="geometry">
-    <rect>
-     <x>480</x>
-     <y>660</y>
-     <width>41</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 17px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>of</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="totalSecondsLabel">
-   <property name="geometry">
-    <rect>
-     <x>515</x>
-     <y>660</y>
-     <width>61</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 17px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>0</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="curSecondLabel">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>660</y>
-     <width>61</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 17px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>0</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="secondsLabel">
-   <property name="geometry">
-    <rect>
-     <x>580</x>
-     <y>660</y>
-     <width>81</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	font-size: 17px;
-	color: rgb(255, 255, 255);
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>seconds</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
   <widget class="QLabel" name="constructRoiLabel">
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>-10</y>
+     <y>-30</y>
      <width>431</width>
      <height>131</height>
     </rect>
@@ -745,7 +549,7 @@
    <property name="geometry">
     <rect>
      <x>970</x>
-     <y>570</y>
+     <y>580</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -769,7 +573,7 @@
    <property name="geometry">
     <rect>
      <x>780</x>
-     <y>630</y>
+     <y>640</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -793,7 +597,7 @@
    <property name="geometry">
     <rect>
      <x>780</x>
-     <y>630</y>
+     <y>640</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -817,7 +621,7 @@
    <property name="geometry">
     <rect>
      <x>780</x>
-     <y>570</y>
+     <y>580</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -851,7 +655,7 @@ QPushButton:checked {
    <property name="geometry">
     <rect>
      <x>970</x>
-     <y>630</y>
+     <y>640</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -875,7 +679,7 @@ QPushButton:checked {
    <property name="geometry">
     <rect>
      <x>970</x>
-     <y>600</y>
+     <y>610</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -901,7 +705,7 @@ QPushButton:checked {
   <widget class="QLabel" name="roiFitNoteLabel">
    <property name="geometry">
     <rect>
-     <x>780</x>
+     <x>370</x>
      <y>690</y>
      <width>341</width>
      <height>41</height>
@@ -922,13 +726,13 @@ frame as reference</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="bmodeCoverLabel">
+  <widget class="QLabel" name="imCoverLabel">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
+     <x>350</x>
+     <y>80</y>
+     <width>801</width>
+     <height>481</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -939,30 +743,15 @@ frame as reference</string>
    <property name="text">
     <string/>
    </property>
-  </widget>
-  <widget class="QLabel" name="ceCoverLabel">
-   <property name="geometry">
-    <rect>
-     <x>770</x>
-     <y>150</y>
-     <width>381</width>
-     <height>351</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	background-color: transparent;
-}</string>
-   </property>
-   <property name="text">
-    <string/>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
   <widget class="QPushButton" name="undoRoiButton">
    <property name="geometry">
     <rect>
      <x>780</x>
-     <y>600</y>
+     <y>610</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -990,7 +779,7 @@ frame as reference</string>
    <property name="geometry">
     <rect>
      <x>780</x>
-     <y>600</y>
+     <y>610</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -1018,7 +807,7 @@ frame as reference</string>
    <property name="geometry">
     <rect>
      <x>970</x>
-     <y>600</y>
+     <y>610</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -1034,6 +823,146 @@ frame as reference</string>
    </property>
    <property name="text">
     <string>Load ROI</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="preLoadedRoiButton">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>580</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Pre-Loaded ROI</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="chooseRoiButton">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>580</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Choose ROI</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="backFromLoadButton">
+   <property name="geometry">
+    <rect>
+     <x>875</x>
+     <y>640</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveRoiButton">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>580</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Save ROI</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="backFromDrawButton">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>690</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Back</string>
    </property>
    <property name="checkable">
     <bool>true</bool>

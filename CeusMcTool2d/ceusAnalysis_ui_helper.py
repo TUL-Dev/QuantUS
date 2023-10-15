@@ -105,17 +105,17 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
                 color: white;
                 background-color: rgba(0,0,0,0);
                 font-size: 13px;
-            }""")
-            self.tmppvLabel.setStyleSheet("""QLabel {
-                color: white;
-                background-color: rgba(0,0,0,0);
-                font-size: 13px;
-            }""")
-            self.tmppvVal.setStyleSheet("""QLabel {
-                color: white;
-                background-color: rgba(0,0,0,0);
-                font-size: 13px;
-            }""")
+            # }""")
+            # self.tmppvLabel.setStyleSheet("""QLabel {
+            #     color: white;
+            #     background-color: rgba(0,0,0,0);
+            #     font-size: 13px;
+            # }""")
+            # self.tmppvVal.setStyleSheet("""QLabel {
+            #     color: white;
+            #     background-color: rgba(0,0,0,0);
+            #     font-size: 13px;
+            # }""")
             self.voiVolumeLabel.setStyleSheet("""QLabel {
                 color: white;
                 background-color: rgba(0,0,0,0);
@@ -127,8 +127,7 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
                 font-size: 13px;
             }""")
 
-        self.mcResultsBmode = None
-        self.mcResultsCE = None
+        self.mcResultsArray = None
         self.curFrameIndex = None
         self.xCur = None
         self.yCur = None
@@ -150,7 +149,7 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
         self.pe = None
         self.tp = None
         self.mtt = None
-        self.tmppv = None
+        # self.tmppv = None
         self.roiArea = None
         self.newData = None
         self.fig = plt.figure()
@@ -171,12 +170,9 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
         # self.mttParamap = None
         # self.tmppvParamap = None
 
-        self.bmodeCoverPixmap = QPixmap(381, 351)
-        self.bmodeCoverPixmap.fill(Qt.transparent)
-        self.bmodeCoverLabel.setPixmap(self.bmodeCoverPixmap)
-        self.ceCoverPixmap = QPixmap(381, 351)
-        self.ceCoverPixmap.fill(Qt.transparent)
-        self.ceCoverLabel.setPixmap(self.ceCoverPixmap)
+        # self.bmodeCoverPixmap = QPixmap(381, 351)
+        # self.bmodeCoverPixmap.fill(Qt.transparent)
+        # self.bmodeCoverLabel.setPixmap(self.bmodeCoverPixmap)
 
         self.setMouseTracking(True)
 
@@ -200,26 +196,49 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
         if self.newData is None:
             self.newData = {"Patient": self.imagePathInput.text(), "Area Under Curve (AUC)": self.auc, \
                             "Peak Enhancement (PE)": self.pe, "Time to Peak (TP)": self.tp, \
-                            "Mean Transit Time (MTT)": self.mtt, "TMPPV": self.tmppv, "ROI Area (mm^2)": self.roiArea}
+                            "Mean Transit Time (MTT)": self.mtt, "ROI Area (mm^2)": self.roiArea}
             self.dataFrame = self.dataFrame.append(self.newData, ignore_index=True)
 
 
     def backToLastScreen(self):
         self.lastGui.dataFrame = self.dataFrame
+        self.lastGui.fig.subplots_adjust(left=0.1, right=0.97, top=0.9, bottom=0.1)
         self.lastGui.show()
         self.hide()
-
-    def updateBmode(self):
-        self.mcDataBmode = np.require(self.mcResultsBmode[self.curFrameIndex], np.uint8, 'C')
-        self.bytesLineMc, _ = self.mcDataBmode[:,:,0].strides
-        self.qImgMcBmode = QImage(self.mcDataBmode, self.x, self.y, self.bytesLineMc, QImage.Format_RGB888)
-        self.mcBmodeDisplayLabel.setPixmap(QPixmap.fromImage(self.qImgMcBmode).scaled(381, 351))
     
-    def updateCE(self):
-        self.mcDataCE = np.require(self.mcResultsCE[self.curFrameIndex], np.uint8, 'C')
-        self.bytesLineMc, _ = self.mcDataCE[:,:,0].strides
-        self.qImgMcCE = QImage(self.mcDataCE, self.x, self.y, self.bytesLineMc, QImage.Format_RGB888)
-        self.mcCeDisplayLabel.setPixmap(QPixmap.fromImage(self.qImgMcCE).scaled(381, 351))
+    def updateIm(self):
+        self.x = self.mcResultsArray.shape[2]
+        self.y = self.mcResultsArray.shape[1]
+        self.numSlices = self.mcResultsArray.shape[0]
+        self.imX0 = 410
+        self.imX1 = 1101
+        self.imY0 = 80
+        self.imY1 = 501
+        xLen = self.imX1 - self.imX0
+        yLen = self.imY1 - self.imY0
+
+        quotient = self.x / self.y
+        if quotient > (xLen/yLen):
+            self.widthScale = xLen
+            self.depthScale = int(self.widthScale / quotient)
+            emptySpace = yLen - self.depthScale
+            yBuffer = int(emptySpace/2)
+            self.imY0 += yBuffer
+            self.imY1 -= yBuffer
+        else:
+            self.widthScale = int(yLen * quotient)
+            self.depthScale = yLen
+            emptySpace = xLen - self.widthScale
+            xBuffer = int(emptySpace/2)
+            self.imX0 += xBuffer
+            self.imX1 -= xBuffer
+        self.imPlane.move(self.imX0, self.imY0)
+        self.imPlane.resize(self.widthScale, self.depthScale)
+
+        self.mcData = np.require(self.mcResultsArray[self.curFrameIndex], np.uint8, 'C')
+        self.bytesLine, _ = self.mcData[:,:,0].strides
+        self.qImg = QImage(self.mcData, self.x, self.y, self.bytesLine, QImage.Format_RGB888)
+        self.imPlane.setPixmap(QPixmap.fromImage(self.qImg).scaled(self.widthScale, self.depthScale))
 
     def setFilenameDisplays(self, imageName):
         self.imagePathInput.setHidden(False)
@@ -229,60 +248,16 @@ class CeusAnalysisGUI(Ui_ceusAnalysis, QWidget):
         self.imagePathInput.setText(imFile)
         self.inputTextPath = imageName
 
-    def updateCrosshair(self):
-        if self.xCur < 741 and self.xCur > 360 and self.yCur < 501 and self.yCur > 150:
-            self.actualX = int((self.xCur - 361)*(self.h_bmode-1)/381)
-            self.actualY = int((self.yCur - 151)*(self.w_bmode-1)/351)
-            plotX = self.xCur - 361
-        elif self.xCur < 1151 and self.xCur > 770 and self.yCur < 501 and self.yCur > 150:
-            self.actualX = int((self.xCur-771)*(self.h_CE-1)/381)
-            self.actualY = int((self.yCur-151)*(self.w_CE-1)/351)
-            plotX = self.xCur - 771
-        else:
-            return
-        
-        plotY = self.yCur - 151
-
-        self.bmodeCoverLabel.pixmap().fill(Qt.transparent)
-        painter = QPainter(self.bmodeCoverLabel.pixmap())
-        painter.setPen(Qt.yellow)
-        bmodeVertLine = QLine(plotX, 0, plotX, 351)
-        bmodeLatLine = QLine(0, plotY, 381, plotY)
-        painter.drawLines([bmodeVertLine, bmodeLatLine])
-        painter.end()
-            
-        self.ceCoverLabel.pixmap().fill(Qt.transparent)
-        painter = QPainter(self.ceCoverLabel.pixmap())
-        painter.setPen(Qt.yellow)
-        ceVertLine = QLine(plotX, 0, plotX, 351)
-        ceLatLine = QLine(0, plotY, 381, plotY)
-        painter.drawLines([ceVertLine, ceLatLine])
-        painter.end()
-        self.update()
-
-    def mousePressEvent(self,event):
-        self.xCur = event.x()
-        self.yCur = event.y()
-
-    def mouseMoveEvent(self, event):
-        self.xCur = event.x()
-        self.yCur = event.y()
-        self.updateCrosshair()
-
     def curSliceSpinBoxValueChanged(self):
         self.curFrameIndex = int(self.curSliceSpinBox.value())
         self.curSliceSlider.setValue(self.curFrameIndex)
-        self.curSecondLabel.setText(str(self.sliceArray[self.curFrameIndex]))
-        self.updateBmode()
-        self.updateCE()
+        self.updateIm()
         self.update()
 
     def curSliceSliderValueChanged(self):
         self.curFrameIndex = int(self.curSliceSlider.value())
         self.curSliceSpinBox.setValue(self.curFrameIndex)
-        self.curSecondLabel.setText(str(self.sliceArray[self.curFrameIndex]))
-        self.updateBmode()
-        self.updateCE()
+        self.updateIm()
         self.update()
 
 if __name__ == "__main__":

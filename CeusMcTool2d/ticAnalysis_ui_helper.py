@@ -79,8 +79,7 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
 
         self.t0Slider.setValue(0)
 
-        self.mcResultsBmode = None
-        self.mcResultsCE = None
+        self.mcResultsArray = None
         self.curFrameIndex = None
         self.xCur = None
         self.yCur = None
@@ -99,15 +98,7 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
         self.h_CE = None
         self.dataFrame = None
         self.ticArray = None
-        self.pixelScale = None
-
-
-        self.bmodeCoverPixmap = QPixmap(231, 211)
-        self.bmodeCoverPixmap.fill(Qt.transparent)
-        self.bmodeCoverLabel.setPixmap(self.bmodeCoverPixmap)
-        self.ceCoverPixmap = QPixmap(231, 211)
-        self.ceCoverPixmap.fill(Qt.transparent)
-        self.ceCoverLabel.setPixmap(self.ceCoverPixmap)
+        # self.pixelScale = None
 
         self.fig = plt.figure()
         self.canvas = FigureCanvas(self.fig)
@@ -154,21 +145,42 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
     def sliceValueChanged(self):
         if not self.t0Slider.isHidden():
             self.curFrameIndex = self.findSliceFromTime(self.t0Slider.value())
-        self.updateBmode()
-        self.updateCE()
+        self.updateIm()
         self.update()
-    
-    def updateBmode(self):
-        self.mcDataBmode = np.require(self.mcResultsBmode[self.curFrameIndex], np.uint8, 'C')
-        self.bytesLineMc, _ = self.mcDataBmode[:,:,0].strides
-        self.qImgMcBmode = QImage(self.mcDataBmode, self.x, self.y, self.bytesLineMc, QImage.Format_RGB888)
-        self.mcBmodeDisplayLabel.setPixmap(QPixmap.fromImage(self.qImgMcBmode).scaled(231, 211))
-    
-    def updateCE(self):
-        self.mcDataCE = np.require(self.mcResultsCE[self.curFrameIndex], np.uint8, 'C')
-        self.bytesLineMc, _ = self.mcDataCE[:,:,0].strides
-        self.qImgMcCE = QImage(self.mcDataCE, self.x, self.y, self.bytesLineMc, QImage.Format_RGB888)
-        self.mcCeDisplayLabel.setPixmap(QPixmap.fromImage(self.qImgMcCE).scaled(231, 211))
+
+    def updateIm(self):
+        self.x = self.mcResultsArray.shape[2]
+        self.y = self.mcResultsArray.shape[1]
+        self.numSlices = self.mcResultsArray.shape[0]
+        self.imX0 = 370
+        self.imX1 = 1141
+        self.imY0 = 80
+        self.imY1 = 341
+        xLen = self.imX1 - self.imX0
+        yLen = self.imY1 - self.imY0
+
+        quotient = self.x / self.y
+        if quotient > (xLen/yLen):
+            self.widthScale = xLen
+            self.depthScale = int(self.widthScale / quotient)
+            emptySpace = yLen - self.depthScale
+            yBuffer = int(emptySpace/2)
+            self.imY0 += yBuffer
+            self.imY1 -= yBuffer
+        else:
+            self.widthScale = int(yLen * quotient)
+            self.depthScale = yLen
+            emptySpace = xLen - self.widthScale
+            xBuffer = int(emptySpace/2)
+            self.imX0 += xBuffer
+            self.imX1 -= xBuffer
+        self.imDisplayLabel.move(self.imX0, self.imY0)
+        self.imDisplayLabel.resize(self.widthScale, self.depthScale)  
+
+        self.mcData = np.require(self.mcResultsArray[self.curFrameIndex], np.uint8, 'C')
+        self.bytesLineMc, _ = self.mcData[:,:,0].strides
+        self.qImgMc = QImage(self.mcData, self.x, self.y, self.bytesLineMc, QImage.Format_RGB888)
+        self.imDisplayLabel.setPixmap(QPixmap.fromImage(self.qImgMc).scaled(self.widthScale, self.depthScale))
 
     def initT0(self):
         self.acceptT0Button.setHidden(False)
@@ -237,6 +249,8 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
             self.ticY = np.delete(self.ticY, self.selectedPoints)
             self.ax.clear()
             self.graph(self.ticX,self.ticY)
+            yRange = max(self.ticY) - min(self.ticY)
+            self.ax.set_ylim(ymin=min(self.ticY)-(0.05*yRange), ymax=max(self.ticY)+(0.05*yRange))
             self.removedPointsX.append(curRemovedX)
             self.removedPointsY.append(curRemovedY)
             self.selectedPoints = []
@@ -350,25 +364,24 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
             self.ceusAnalysisGui.ax.set_xlim(xmin=min(self.ticX[:,0])-(0.05*range), xmax=max(self.ticX[:,0])+(0.05*range))
         except RuntimeError:
             print('RunTimeError')
-            params = np.array([np.max(self.ticY)*tmppv, np.trapz(self.ticY*tmppv, x=self.ticX[:,0]), self.ticX[-1,0], np.argmax(self.ticY), np.max(self.ticX[:,0])*2, 0]);
+            params = np.array([np.max(self.ticY), np.trapz(self.ticY, x=self.ticX[:,0]), self.ticX[-1,0], np.argmax(self.ticY), np.max(self.ticX[:,0])*2, 0]);
+            # params = np.array([np.max(self.ticY)*tmppv, np.trapz(self.ticY*tmppv, x=self.ticX[:,0]), self.ticX[-1,0], np.argmax(self.ticY), np.max(self.ticX[:,0])*2, 0]);
         self.fig.subplots_adjust(left=0.1, right=0.97, top=0.85, bottom=0.25)
         self.canvas.draw()
-        self.ticY *= tmppv
+        # self.ticY *= tmppv
 
         self.ceusAnalysisGui.aucVal.setText(str(np.around(params[1], decimals=3)))
         self.ceusAnalysisGui.peVal.setText(str(np.around(params[0], decimals=3)))
         self.ceusAnalysisGui.tpVal.setText(str(np.around(params[2], decimals=2)))
         self.ceusAnalysisGui.mttVal.setText(str(np.around(params[3], decimals=2)))
-        self.ceusAnalysisGui.tmppvVal.setText(str(np.around(tmppv, decimals=1)))
+        # self.ceusAnalysisGui.tmppvVal.setText(str(np.around(tmppv, decimals=1)))
         self.ceusAnalysisGui.voiVolumeVal.setText(str(np.around(self.roiArea, decimals=1)))
         self.ceusAnalysisGui.auc = params[1]
         self.ceusAnalysisGui.pe = params[0]
         self.ceusAnalysisGui.tp = params[2]
         self.ceusAnalysisGui.mtt = params[3]
-        self.ceusAnalysisGui.tmppv = tmppv
+        # self.ceusAnalysisGui.tmppv = tmppv
         self.ceusAnalysisGui.roiArea = self.roiArea
-        self.ceusAnalysisGui.mcResultsBmode = self.mcResultsBmode
-        self.ceusAnalysisGui.mcResultsCE = self.mcResultsCE
         self.ceusAnalysisGui.curFrameIndex = self.curFrameIndex
         self.ceusAnalysisGui.xCur = self.xCur
         self.ceusAnalysisGui.yCur = self.yCur
@@ -384,15 +397,15 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
         self.ceusAnalysisGui.y0_CE = self.y0_CE
         self.ceusAnalysisGui.w_CE = self.w_CE
         self.ceusAnalysisGui.h_CE = self.h_CE
-        self.ceusAnalysisGui.curSliceSpinBox.setValue(self.sliceArray[self.curFrameIndex])
-        self.ceusAnalysisGui.curSliceSlider.setValue(self.curFrameIndex)
-        self.ceusAnalysisGui.curSliceTotal.setText(str(self.mcResultsBmode.shape[0]-1))
-        self.ceusAnalysisGui.totalSecondsLabel.setText(str(self.sliceArray[-1]))
-        self.ceusAnalysisGui.curSliceSlider.setMaximum(self.mcResultsBmode.shape[0]-1)
-        self.ceusAnalysisGui.curSliceSpinBox.setMaximum(self.mcResultsBmode.shape[0]-1)
+        self.ceusAnalysisGui.mcResultsArray = self.mcResultsArray
 
-        self.ceusAnalysisGui.updateBmode()
-        self.ceusAnalysisGui.updateCE()
+        self.ceusAnalysisGui.curSliceSlider.setMaximum(self.mcResultsArray.shape[0]-1)
+        self.ceusAnalysisGui.curSliceSpinBox.setMaximum(self.mcResultsArray.shape[0]-1)
+        self.ceusAnalysisGui.curSliceSpinBox.setValue(self.curFrameIndex)
+        self.ceusAnalysisGui.curSliceSlider.setValue(self.curFrameIndex)
+        self.ceusAnalysisGui.curSliceTotal.setText(str(self.mcResultsArray.shape[0]-1))
+
+        self.ceusAnalysisGui.updateIm()
         self.ceusAnalysisGui.show()
         self.ceusAnalysisGui.curSliceSlider.setValue(self.curFrameIndex)
         self.ceusAnalysisGui.lastGui = self
@@ -427,12 +440,15 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
         # self.ticX[:,0] -= (min(self.ticX[:,0]) - 1)
         self.ax.clear()
         self.graph(self.ticX, self.ticY)
+        yRange = max(self.ticY) - min(self.ticY)
+        self.ax.set_ylim(ymin=min(self.ticY)-(0.05*yRange), ymax=max(self.ticY)+(0.05*yRange))
 
     def rect_highlight(self, event1, event2):
         self.mask |= self.inside(event1, event2)
         x = self.ticX[:,0][self.mask]
         y = self.ticY[self.mask]
         addedIndices = np.sort(np.array(list(range(len(self.ticY))))[self.mask])
+        self.selectedPoints = []
         for index in addedIndices:
             self.selectedPoints.append(index) 
         self.ax.scatter(x, y, color='orange')
@@ -462,7 +478,7 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
             self.selectedPoints = []
             j = 0
             i = 0
-            max = self.ticX.shape[0] + len(self.removedPointsX[-1])
+            curMax = self.ticX.shape[0] + len(self.removedPointsX[-1])
             while i < self.ticX.shape[0]-1:
                 if self.ticX[i][0] < self.removedPointsX[-1][j][0] and self.removedPointsX[-1][j][0] < self.ticX[i+1][0]:
                     self.ticX = np.insert(self.ticX, i+1, self.removedPointsX[-1][j], axis=0)
@@ -471,7 +487,7 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
                     if j == len(self.removedPointsX[-1]):
                         break
                 i += 1
-            if i < max and j < len(self.removedPointsX[-1]):
+            if i < curMax and j < len(self.removedPointsX[-1]):
                 while j < len(self.removedPointsX[-1]):
                     self.ticX = np.insert(self.ticX, i+1, self.removedPointsX[-1][j], axis=0)
                     self.ticY = np.append(self.ticY, self.removedPointsY[-1][j])
@@ -483,6 +499,8 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
             ticX = self.ticX
             ticY = self.ticY
             self.graph(ticX, ticY)
+            yRange = max(self.ticY) - min(self.ticY)
+            self.ax.set_ylim(ymin=min(self.ticY)-(0.05*yRange), ymax=max(self.ticY)+(0.05*yRange))
 
     def selectPoint(self, event):
         if self.t0Slider.isHidden():
@@ -493,8 +511,7 @@ class TicAnalysisGUI(Ui_ticEditor, QWidget):
                 self.timeLine.remove()
             self.timeLine = self.ax.axvline(x = xdata[ind], color = (0,0,1,0.3), label = 'axvline - full height', zorder=1)
             self.curFrameIndex = self.findSliceFromTime(xdata[ind])
-            self.updateBmode()
-            self.updateCE()
+            self.updateIm()
             self.canvas.draw()    
         
 

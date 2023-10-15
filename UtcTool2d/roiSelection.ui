@@ -685,7 +685,7 @@ QPushButton:checked {
   <widget class="QLabel" name="imDisplayFrame">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>400</x>
      <y>170</y>
      <width>721</width>
      <height>501</height>
@@ -701,7 +701,7 @@ QPushButton:checked {
   <widget class="QLabel" name="imMaskFrame">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>400</x>
      <y>170</y>
      <width>721</width>
      <height>501</height>
@@ -722,7 +722,7 @@ QPushButton:checked {
   <widget class="QLabel" name="imCoverFrame">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>400</x>
      <y>170</y>
      <width>721</width>
      <height>501</height>
