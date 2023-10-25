@@ -164,6 +164,7 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
         self.xBorderMin = None
         self.imWidthScale = None
         self.imDepthScale = None
+        self.oneWindow = None
 
         self.continueButton.clicked.connect(self.continueToRfAnalysis)
         self.backButton.clicked.connect(self.backToLastScreen)

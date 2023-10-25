@@ -422,10 +422,17 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
         global scanConverted
         if self.oneWindow != None:
             self.roiWindowSplinesStruct = RoiPositionsStruct()
+<<<<<<< HEAD
+            self.roiWindowSplinesStruct.top = [self.oneWindow[0]]
+            self.roiWindowSplinesStruct.bottom = [self.oneWindow[1]]
+            self.roiWindowSplinesStruct.left = [self.oneWindow[2]]
+            self.roiWindowSplinesStruct.right = [self.oneWindow[3]]
+=======
             self.roiWindowSplinesStruct.left = [self.oneWindow[0]]
             self.roiWindowSplinesStruct.right = [self.oneWindow[1]]
             self.roiWindowSplinesStruct.top = [self.oneWindow[2]]
             self.roiWindowSplinesStruct.bottom = [self.oneWindow[3]]
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
             self.roiWindowSplinesStructPreSC = self.roiWindowSplinesStruct
             return
         try:

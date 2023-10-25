@@ -1172,38 +1172,17 @@ QPushButton:checked {
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="acceptRectButton">
-   <property name="geometry">
-    <rect>
-     <x>890</x>
-     <y>110</y>
-     <width>251</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
-	color: white;
-	font-size: 16px;
-	background: rgb(90, 37, 255);
-	border-radius: 15px;
-}
-</string>
-   </property>
-   <property name="text">
-    <string>Accept Rectangle</string>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
+<<<<<<< HEAD
   <widget class="QPushButton" name="drawRectButton">
    <property name="geometry">
     <rect>
      <x>370</x>
+=======
+  <widget class="QPushButton" name="acceptRectButton">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
      <y>110</y>
      <width>251</width>
      <height>41</height>
@@ -1216,6 +1195,7 @@ QPushButton:checked {
 	background: rgb(90, 37, 255);
 	border-radius: 15px;
 }
+<<<<<<< HEAD
 QPushButton:checked {
 	color:white; 
 	font-size: 16px;
@@ -1226,6 +1206,12 @@ QPushButton:checked {
    </property>
    <property name="text">
     <string>Draw Rectangle</string>
+=======
+</string>
+   </property>
+   <property name="text">
+    <string>Accept Rectangle</string>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
    </property>
    <property name="checkable">
     <bool>true</bool>
@@ -1234,10 +1220,65 @@ QPushButton:checked {
     <bool>false</bool>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QPushButton" name="redrawRectButton">
    <property name="geometry">
     <rect>
      <x>630</x>
+=======
+  <widget class="QPushButton" name="drawRectButton">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
+     <y>110</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}
+<<<<<<< HEAD
+</string>
+   </property>
+   <property name="text">
+    <string>Redo Rectangle</string>
+=======
+QPushButton:checked {
+	color:white; 
+	font-size: 16px;
+	background: rgb(45, 0, 110);
+	border-radius: 15px;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Draw Rectangle</string>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+<<<<<<< HEAD
+  <widget class="QPushButton" name="acceptRectButton">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+=======
+  <widget class="QPushButton" name="redrawRectButton">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
      <y>110</y>
      <width>251</width>
      <height>41</height>
@@ -1253,7 +1294,11 @@ QPushButton:checked {
 </string>
    </property>
    <property name="text">
+<<<<<<< HEAD
+    <string>Accept Rectangle</string>
+=======
     <string>Redo Rectangle</string>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
    </property>
    <property name="checkable">
     <bool>true</bool>
@@ -1307,8 +1352,11 @@ QPushButton:checked {
   <zorder>imDisplayFrame</zorder>
   <zorder>imMaskFrame</zorder>
   <zorder>imCoverFrame</zorder>
+<<<<<<< HEAD
+=======
   <zorder>loadRoiButton</zorder>
   <zorder>newRoiButton</zorder>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
   <zorder>acceptLoadedRoiButton</zorder>
   <zorder>undoLoadedRoiButton</zorder>
   <zorder>physicalDimsLabel</zorder>
@@ -1321,10 +1369,19 @@ QPushButton:checked {
   <zorder>pixelDepthVal</zorder>
   <zorder>pixelDimsLabel</zorder>
   <zorder>pixelWidthVal</zorder>
+<<<<<<< HEAD
+  <zorder>newRoiButton</zorder>
+  <zorder>rectRoiButton</zorder>
+  <zorder>loadRoiButton</zorder>
+  <zorder>drawRectButton</zorder>
+  <zorder>redrawRectButton</zorder>
+  <zorder>acceptRectButton</zorder>
+=======
   <zorder>acceptRectButton</zorder>
   <zorder>drawRectButton</zorder>
   <zorder>rectRoiButton</zorder>
   <zorder>redrawRectButton</zorder>
+>>>>>>> 26f306db3fd746efd9f22f176306475dbce85142
  </widget>
  <resources/>
  <connections/>

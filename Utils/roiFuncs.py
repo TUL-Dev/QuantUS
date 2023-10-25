@@ -110,6 +110,7 @@ def computePowerSpec(RFData, startFrequency, endFrequency, samplingFrequency):
     # Get PS
     windFunc = np.ones(windFunc.shape)
     fft = np.square(abs(np.fft.fft(np.transpose(np.multiply(RFData,windFunc)),8192)*RFData.size))
+    temp = np.mean(fft, axis=0) # for debugging
     fullPS = 20*np.log10(np.mean(fft, axis=0))
 
     ps = fullPS[fLow:fHigh]
@@ -259,6 +260,10 @@ def computeSpecWindows(
     f0 = minFrequency  
     f1 = maxFrequency
     fRange = round(f1*(8192/fs)) - round(f0*(8192/fs))
+    # hacky workaround to avoid error in the part below "get ready to send output"
+    imgWindow = imgRF[top[0]:bottom[0],left[0]:right[0]]
+    [_, temp] = computePowerSpec(imgWindow, f0, f1, fs)
+    fRange = min(fRange, len(temp))
 
     # Output pre-allocation
     if len(top) >= 1:
