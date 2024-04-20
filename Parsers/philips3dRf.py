@@ -1,7 +1,10 @@
+import os
+
 from scipy.io import loadmat
 from scipy.signal import hilbert
 import numpy as np
-from Utils.parserTools import scanConvert
+
+from Parsers.philipsSipVolumeParser import ScParams, scanConvert3dVolumeSeries, readScVdbParams
 
 class FileStruct():
     def __init__(self, filedirectory, filename):
@@ -97,18 +100,27 @@ def getImage(filename, filedirectory, refname, refdirectory):
 
 def getData(Files, RefFiles):
     input = loadmat(str(Files.directory + Files.name))
-    ImgInfo = readFileInfo(Files.name, Files.directory)
-    [ImgData, ImgInfo] = readFileImg(ImgInfo, input)
+    ImgInfo, scParams = readFileInfo(Files.name, Files.directory)
+    [ImgData, ImgInfo] = readFileImg(ImgInfo, input, scParams)
 
     input = loadmat(str(RefFiles.directory + RefFiles.name))
-    RefInfo = readFileInfo(RefFiles.name, RefFiles.directory)
-    [RefData, RefInfo] = readFileImg(RefInfo, input)
+    RefInfo, scParams = readFileInfo(RefFiles.name, RefFiles.directory)
+    [RefData, RefInfo] = readFileImg(RefInfo, input, scParams)
 
     return [ImgInfo, RefInfo, ImgData, RefData]
 
-def readFileInfo(filename, filepath):    
+def readFileInfo(filename, filepath, pixPerMm=1.2):    
     studyID = filename[:-4]
     studyEXT = filename[-4:]
+
+    # Input paths/filenames
+    vdbFilename = str(filename[:-4] + "_Extras.txt")
+
+    scParams = readScVdbParams(os.path.join(filepath, vdbFilename))
+    if scParams.NUM_PLANES is None:
+        scParams.NUM_PLANES = 20
+    if scParams.pixPerMm is None:
+        scParams.pixPerMm = pixPerMm
 
     Info = InfoStruct()
     Info.studyMode = "RF"
@@ -158,9 +170,9 @@ def readFileInfo(filename, filepath):
     Info.xRes = 1
     Info.quad2x = 1
 
-    return Info
+    return Info, scParams
 
-def readFileImg(Info, input):
+def readFileImg(Info, input, scParams):
     echoData = input["rf_data_all_fund"]# indexing works by frame, angle, image
     while not(len(echoData[0].shape) > 1 and echoData[0].shape[0]>40 and echoData[0].shape[1]>40):
         echoData = echoData[0]
@@ -181,28 +193,31 @@ def readFileImg(Info, input):
 
     ModeIM = echoData
 
-    scBmode = None #np.array([bmode.shape[0]]+[])
-    scModeIM = None #np.array(ModeIM.shape)
-    for fnum in range(echoData.shape[0]):
-        if scBmode is None:
-            [firstScBmode, hCm1, wCm1, _] = scanConvert(bmode[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
-            [_, hCm1, wCm1, firstScBmodeIM] = scanConvert(ModeIM[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
-            scBmode = np.zeros(tuple([bmode.shape[0]])+firstScBmode.shape)
-            scBmode[fnum] = firstScBmode
-            scModeIM = np.zeros([ModeIM.shape[0]], dtype=object)
-            scModeIM[fnum] = firstScBmodeIM
-        else:
-            [scBmode[fnum], hCm1, wCm1, _] = scanConvert(bmode[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
-            [_, hCm1, wCm1, scModeIM[fnum]] = scanConvert(ModeIM[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
+    # scBmode = None #np.array([bmode.shape[0]]+[])
+    # scModeIM = None #np.array(ModeIM.shape)
+    scBmode, bmodeDims = scanConvert3dVolumeSeries(bmode, scParams)
+    scRf, rfDims = scanConvert3dVolumeSeries(ModeIM, scParams)
 
-    Info.lateralRes = wCm1*10/scBmode.shape[2]
-    Info.axialRes = hCm1*10/scBmode.shape[1]
-    Info.depth = hCm1
-    Info.width = wCm1
+    # for fnum in range(echoData.shape[0]):
+    #     if scBmode is None:
+    #         [firstScBmode, hCm1, wCm1, _] = scanConvert(bmode[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
+    #         [_, hCm1, wCm1, firstScBmodeIM] = scanConvert(ModeIM[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
+    #         scBmode = np.zeros(tuple([bmode.shape[0]])+firstScBmode.shape)
+    #         scBmode[fnum] = firstScBmode
+    #         scModeIM = np.zeros([ModeIM.shape[0]], dtype=object)
+    #         scModeIM[fnum] = firstScBmodeIM
+    #     else:
+    #         [scBmode[fnum], hCm1, wCm1, _] = scanConvert(bmode[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
+    #         [_, hCm1, wCm1, scModeIM[fnum]] = scanConvert(ModeIM[fnum], Info.width1, Info.tilt1, Info.startDepth1, Info.endDepth1, Info.endHeight)
+
+    # Info.lateralRes = wCm1*10/scBmode.shape[2]
+    # Info.axialRes = hCm1*10/scBmode.shape[1]
+    # Info.depth = hCm1
+    # Info.width = wCm1
     Info.maxval = np.amax(scBmode)
 
     Data = DataOutputStruct()
-    Data.scRF = scModeIM
+    Data.scRF = scRf
     Data.scBmode = scBmode * (255/Info.maxval)
     Data.rf = ModeIM
     Data.bMode = bmode * (255/np.amax(bmode))

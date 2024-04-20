@@ -1,7 +1,8 @@
 import Parsers.verasonicsMatParser as vera
 import Parsers.canonBinParser as canon
 import Parsers.terasonRfParser as tera
-from Parsers.philipsMatParser import getImage as philipsMatParser
+import Parsers.siemensRfdParser as rfdParser
+from Parsers.philips3dRf import getImage as philipsMatParser
 from Parsers.philipsRfParser import main_parser_stanford as philipsRfParser
 from UtcTool2d.roiSelection_ui import Ui_constructRoi
 from UtcTool2d.editImageDisplay_ui_helper import EditImageDisplayGUI
@@ -385,6 +386,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.processImage(
             imArray, imgDataStruct, refDataStruct, imgInfoStruct, refInfoStruct
         )
+        self.displayInitialImage()
 
         self.editImageDisplayGUI.brightnessVal.setValue(1)
         self.editImageDisplayGUI.sharpnessVal.setValue(1)
@@ -411,8 +413,9 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.processImage(
             imArray, imgDataStruct, refDataStruct, imgInfoStruct, refInfoStruct
         )
+        self.displayInitialImage()
 
-    def openPhilipsImage(self, imageFilePath, phantomFilePath):
+    def openPhilipsImage(self, imageFilePath, phantomFilePath, frame=0):
         tmpLocation = imageFilePath.split("/")
         dataFileName = tmpLocation[-1]
         dataFileLocation = imageFilePath[:len(imageFilePath)-len(dataFileName)]
@@ -447,12 +450,24 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
                 phantFileName = str(phantFileName[:-3]+'.mat')
 
         # Display Philips image and assign relevant default analysis params
-        self.frame = None
-        imArray, imgDataStruct, imgInfoStruct, refDataStruct, refInfoStruct = philipsMatParser(dataFileName, dataFileLocation, phantFileName, phantFileLocation, self.frame)
+        imArray, imgDataStruct, imgInfoStruct, refDataStruct, refInfoStruct = philipsMatParser(dataFileName, dataFileLocation, phantFileName, phantFileLocation)
 
-        self.processImage(
+        frames = [frameArr for frameArr in imArray]
+        return map(self.processImage, frames, [imgDataStruct]*len(frames), [refDataStruct]*len(frames), [imgInfoStruct]*len(frames), [refInfoStruct]*len(frames))
+    
+    def openSiemensImage(self, imageFilePath, phantomFilePath):
+        tmpLocation = imageFilePath.split("/")
+        dataFileName = tmpLocation[-1]
+        dataFileLocation = imageFilePath[:len(imageFilePath)-len(dataFileName)]
+        tmpPhantLocation = phantomFilePath.split("/")
+        phantFileName = tmpPhantLocation[-1]
+        phantFileLocation = phantomFilePath[:len(phantomFilePath)-len(phantFileName)]
+
+        imArray, imgDataStruct, imgInfoStruct, refDataStruct, refInfoStruct = rfdParser.getImage(dataFileName, dataFileLocation, phantFileName, phantFileLocation)
+
+        return self.processImage(
             imArray, imgDataStruct, refDataStruct, imgInfoStruct, refInfoStruct
-        )    
+        )
 
     def openImageTerason(self, imageFilePath, phantomFilePath):
         imgDataStruct, imgInfoStruct, refDataStruct, refInfoStruct = tera.getImage(
@@ -465,6 +480,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.processImage(
             imArray, imgDataStruct, refDataStruct, imgInfoStruct, refInfoStruct
         )
+        self.displayInitialImage()
 
     def processImage(
         self, imArray, imgDataStruct, refDataStruct, imgInfoStruct, refInfoStruct
@@ -495,7 +511,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.RefDisplayInfo.samplingFrequency = refInfoStruct.samplingFrequency
 
         # Display images correctly
-        quotient = self.ImDisplayInfo.width / self.ImDisplayInfo.depth
+        quotient = self.ImDisplayInfo.width / self.ImDisplayInfo.width
         if quotient > (721 / 501):
             self.AnalysisInfo.roiWidthScale = 721
             self.AnalysisInfo.roiDepthScale = int(self.AnalysisInfo.roiWidthScale / (
@@ -515,7 +531,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         imData = np.array(imArray).reshape(
             self.AnalysisInfo.pixDepth, self.AnalysisInfo.pixWidth
         )
-        imData = np.flipud(imData)  # flipud
+        # imData = np.flipud(imData)  # flipud
         imData = np.require(imData, np.uint8, "C")
         self.bytesLine = imData.strides[0]
         self.qIm = QImage(
@@ -547,7 +563,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.editImageDisplayGUI.brightnessVal.setValue(0.75)
         self.editImageDisplayGUI.sharpnessVal.setValue(3)
 
-        self.displayInitialImage()
+        return self.qIm, self.AnalysisInfo.roiWidthScale, self.AnalysisInfo.roiDepthScale
 
     def displayInitialImage(self):
         speedOfSoundInTissue = 1540  # m/s

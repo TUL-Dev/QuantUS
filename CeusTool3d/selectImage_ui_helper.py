@@ -376,9 +376,8 @@ class SelectImageGUI_CeusTool3d(Ui_selectImage, QWidget):
                     nProcs = int(self.nProcSpinBox.value())
                     pixPerMm = self.pixPerMmSpinBox.value()
                     sipFilename = os.path.basename(self.xmlImagePathInput.text())
-                    os.system(f"python Parsers/philipsSipVolumeParser.py {os.path.dirname(self.xmlImagePathInput.text())} \
-                              {self.niftiImageDestinationPath.text()} {sipFilename} \
-                              {nProcs} {pixPerMm}")
+                    os.system(f"python Parsers/philipsSipVolumeParser.py \"{os.path.dirname(self.xmlImagePathInput.text())}\" \
+                              \"{self.niftiImageDestinationPath.text()}\" \"{sipFilename}\" {nProcs} {pixPerMm}")
                     
                     destFolderName = "_".join(sipFilename.split("_")[:2])
                     destFolder = os.path.join(self.niftiImageDestinationPath.text(), destFolderName)

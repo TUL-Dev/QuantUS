@@ -142,6 +142,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.dataFrame = None
         self.machine = None
         self.fileExts = None
+        self.frame = 0
 
         self.terasonButton.clicked.connect(self.terasonClicked)
         self.philipsButton.clicked.connect(self.philipsClicked)
@@ -166,27 +167,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         if os.path.exists(self.imagePathInput.text()) and os.path.exists(
             self.phantomPathInput.text()
         ):
-            # if self.imagePathInput.text().endswith('.rfd') and self.phantomPathInput.text().endswith('.rfd'):
-            #     imageName = self.imagePathInput.text().split('/')[-1]
-            #     phantomName = self.phantomPathInput.text().split('/')[-1]
-            #     vIm = imageName.split("SpV")[1]
-            #     vIm = vIm.split("_")[0]
-            #     fIm = imageName.split("VpF")[1]
-            #     fIm = fIm.split("_")[0]
-            #     aIm = imageName.split("FpA")[1]
-            #     aIm = aIm.split("_")[0]
-            #     vPhant = phantomName.split("SpV")[1]
-            #     vPhant = vPhant.split("_")[0]
-            #     fPhant = phantomName.split("VpF")[1]
-            #     fPhant = fPhant.split("_")[0]
-            #     aPhant = phantomName.split("FpA")[1]
-            #     aPhant = aPhant.split("_")[0]
-
-            #     if aPhant < aIm or vPhant < vIm or fPhant < fPhant:
-            #         self.selectImageErrorMsg.setText("ERROR: At least one dimension of phantom data\nsmaller than corresponding dimension\nof image data")
-            #         self.selectImageErrorMsg.setHidden(False)
-            #         return
-
             if self.roiSelectionGUI is not None:
                 plt.close(self.roiSelectionGUI.figure)
             del self.roiSelectionGUI
@@ -215,60 +195,66 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
                     self.imagePathInput.text(), self.phantomPathInput.text()
                 )
             elif self.machine == "Philips":
-                self.roiSelectionGUI.openPhilipsImage(
+                self.qIms, self.widthScale, self.depthScale = np.transpose(list(self.roiSelectionGUI.openPhilipsImage(
+                    self.imagePathInput.text(), self.phantomPathInput.text()
+                )))
+                self.widthScale = self.widthScale[0]
+                self.depthScale = self.depthScale[0]
+                self.numFrames = self.qIms.shape[0]
+                self.showFrameSlider()
+            elif self.machine == "Siemens":
+                self.qIm, self.widthScale, self.depthScale, self.numFrames = self.roiSelectionGUI.openSiemensImage(
                     self.imagePathInput.text(), self.phantomPathInput.text()
                 )
-            elif self.machine == "Siemens":
-                self.openSiemensImage()
-                self.roiSelectionGUI.machine = self.machine
-                self.roiSelectionGUI.dataFrame = self.dataFrame
+                self.showFrameSlider()
+                # self.openSiemensImage()
                 return
             else:
                 print("ERROR: Machine match not found")
                 return
-            self.roiSelectionGUI.show()
-            self.roiSelectionGUI.machine = self.machine
+            # self.roiSelectionGUI.show()
             self.roiSelectionGUI.dataFrame = self.dataFrame
             self.roiSelectionGUI.lastGui = self
             self.selectImageErrorMsg.setHidden(True)
-            self.hide()
+            # self.hide()
 
-    def openSiemensImage(self):
-        imageFilePath = self.imagePathInput.text()
-        phantomFilePath = self.phantomPathInput.text()
+    # def openSiemensImage(self):
+    #     imageFilePath = self.imagePathInput.text()
+    #     phantomFilePath = self.phantomPathInput.text()
 
-        tmpLocation = imageFilePath.split("/")
-        dataFileName = tmpLocation[-1]
-        dataFileLocation = imageFilePath[:len(imageFilePath)-len(dataFileName)]
-        tmpPhantLocation = phantomFilePath.split("/")
-        phantFileName = tmpPhantLocation[-1]
-        phantFileLocation = phantomFilePath[:len(phantomFilePath)-len(phantFileName)]
+    #     tmpLocation = imageFilePath.split("/")
+    #     dataFileName = tmpLocation[-1]
+    #     dataFileLocation = imageFilePath[:len(imageFilePath)-len(dataFileName)]
+    #     tmpPhantLocation = phantomFilePath.split("/")
+    #     phantFileName = tmpPhantLocation[-1]
+    #     phantFileLocation = phantomFilePath[:len(phantomFilePath)-len(phantFileName)]
 
 
-        self.imArray, self.imgDataStruct, self.imgInfoStruct, self.refDataStruct, self.refInfoStruct = rfdParser.getImage(dataFileName, dataFileLocation, phantFileName, phantFileLocation)
-        self.initialImgRf = self.imgDataStruct.rf
-        self.initialRefRf = self.refDataStruct.rf
-        self.frame = 0
-        self.imData = np.array(self.imArray[self.frame]).reshape(self.imArray.shape[1], self.imArray.shape[2])
-        self.imData = np.require(self.imData,np.uint8,'C')
-        self.bytesLine = self.imData.strides[0]
-        self.arHeight = self.imData.shape[0]
-        self.arWidth = self.imData.shape[1]
-        self.qIm = QImage(self.imData, self.arWidth, self.arHeight, self.bytesLine, QImage.Format_Grayscale8)
+    #     self.imArray, self.imgDataStruct, self.imgInfoStruct, self.refDataStruct, self.refInfoStruct = rfdParser.getImage(dataFileName, dataFileLocation, phantFileName, phantFileLocation)
+    #     self.initialImgRf = self.imgDataStruct.rf
+    #     self.initialRefRf = self.refDataStruct.rf
+    #     self.frame = 0
+    #     self.imData = np.array(self.imArray[self.frame]).reshape(self.imArray.shape[1], self.imArray.shape[2])
+    #     self.imData = np.require(self.imData,np.uint8,'C')
+    #     self.bytesLine = self.imData.strides[0]
+    #     self.arHeight = self.imData.shape[0]
+    #     self.arWidth = self.imData.shape[1]
+    #     self.qIm = QImage(self.imData, self.arWidth, self.arHeight, self.bytesLine, QImage.Format_Grayscale8)
 
-        quotient = self.imgInfoStruct.width / self.imgInfoStruct.depth
-        if quotient > (721/501):
-            self.widthScale = 721
-            self.depthScale = self.widthScale / (self.imgInfoStruct.width/self.imgInfoStruct.depth)
-        else:
-            self.widthScale = 501 * quotient
-            self.depthScale = 501
-        self.yBorderMin = 110 + ((501 - self.depthScale)/2)
-        self.yBorderMax = 611 - ((501 - self.depthScale)/2)
-        self.xBorderMin = 410 + ((721 - self.widthScale)/2)
-        self.xBorderMax = 1131 - ((721 - self.widthScale)/2)
+    #     quotient = self.imgInfoStruct.width / self.imgInfoStruct.depth
+    #     if quotient > (721/501):
+    #         self.widthScale = 721
+    #         self.depthScale = self.widthScale / (self.imgInfoStruct.width/self.imgInfoStruct.depth)
+    #     else:
+    #         self.widthScale = 501 * quotient
+    #         self.depthScale = 501
+    #     self.yBorderMin = 110 + ((501 - self.depthScale)/2)
+    #     self.yBorderMax = 611 - ((501 - self.depthScale)/2)
+    #     self.xBorderMin = 410 + ((721 - self.widthScale)/2)
+    #     self.xBorderMax = 1131 - ((721 - self.widthScale)/2)
 
-        self.imPreview.setPixmap(QPixmap.fromImage(self.qIm).scaled(self.widthScale, self.depthScale))
+    def showFrameSlider(self):
+        self.imPreview.setPixmap(QPixmap.fromImage(self.qIms[0]).scaled(self.widthScale, self.depthScale))
 
         self.totalFramesLabel.setHidden(False)
         self.ofFramesLabel.setHidden(False)
@@ -295,9 +281,9 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.acceptFrameButton.setHidden(False)
 
         self.curFrameSlider.setMinimum(0)
-        self.curFrameSlider.setMaximum(self.imArray.shape[0]-1)
+        self.curFrameSlider.setMaximum(self.numFrames-1)
         self.curFrameLabel.setText("0")
-        self.totalFramesLabel.setText(str(self.imArray.shape[0]-1))
+        self.totalFramesLabel.setText(str(self.numFrames-1))
         self.curFrameSlider.valueChanged.connect(self.frameChanged)
         self.acceptFrameButton.clicked.connect(self.acceptFrame)
 
@@ -318,10 +304,10 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.hide()
 
     def plotPreviewFrame(self):
-        self.imData = np.array(self.imArray[self.frame]).reshape(self.imArray.shape[1], self.imArray.shape[2])
-        self.imData = np.require(self.imData,np.uint8,'C')
-        self.qIm = QImage(self.imData, self.arWidth, self.arHeight, self.bytesLine, QImage.Format_Grayscale8)
-        self.imPreview.setPixmap(QPixmap.fromImage(self.qIm).scaled(self.widthScale, self.depthScale))
+        # self.imData = np.array(self.imArray[self.frame]).reshape(self.imArray.shape[1], self.imArray.shape[2])
+        # self.imData = np.require(self.imData,np.uint8,'C')
+        # self.qIm = QImage(self.imData, self.arWidth, self.arHeight, self.bytesLine, QImage.Format_Grayscale8)
+        self.imPreview.setPixmap(QPixmap.fromImage(self.qIms[self.frame]).scaled(self.widthScale, self.depthScale))
         self.update()
 
     def clearImagePath(self):

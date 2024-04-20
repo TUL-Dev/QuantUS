@@ -116,7 +116,7 @@ def formatVolumePix(unformattedVolume: Iterable, lowerLim: int = 145, upperLim: 
     unformattedVolume *= 255/np.amax(unformattedVolume)
     return unformattedVolume.astype('uint8')
 
-def readSIPscVDBParams(filename):
+def readScVdbParams(filename):
     print("Reading SIP scan conversion VDB Params...")
     file = open(filename, "r")
     scParams = ScParams()
@@ -235,7 +235,7 @@ class Philips4dParser:
         vdbFilename = str("_".join(sipFilename.split("_")[:2]) + "_vdbDump.xml")
         scParamFilename = str(vdbFilename+"_Extras.txt")
 
-        self.scParams = readSIPscVDBParams(os.path.join(pathToData, scParamFilename))
+        self.scParams = readScVdbParams(os.path.join(pathToData, scParamFilename))
         if self.scParams.NUM_PLANES is None:
             self.scParams.NUM_PLANES = 20
         if self.scParams.pixPerMm is None:
@@ -273,26 +273,26 @@ class Philips4dParser:
         return bmodeDims, ceusDims, linVol.shape, nLinVol.shape
 
 if __name__ == "__main__":  # confirms that the code is under main function
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('dataFolder', metavar='FOLDER', type=str, nargs=1,
-                        help='parent folder of file to parse')
-    parser.add_argument('destFolder', metavar='DEST', type=str, nargs=1,
-                        help='destination folder of outputs')
-    parser.add_argument('sipFilename', metavar='FILE', type=str, nargs=1,
-                        help='name of file to parse')
-    parser.add_argument('nProcs', metavar='PROCS', type=int, nargs=1,
-                        help='number of processes for parsing')
-    parser.add_argument('pixPerMm', metavar='RES', type=float, nargs=1,
-                        help='resolution of output volumes')
+    # parser = argparse.ArgumentParser(description='Process some integers.')
+    # parser.add_argument('dataFolder', metavar='FOLDER', type=str, nargs=1,
+    #                     help='parent folder of file to parse')
+    # parser.add_argument('destFolder', metavar='DEST', type=str, nargs=1,
+    #                     help='destination folder of outputs')
+    # parser.add_argument('sipFilename', metavar='FILE', type=str, nargs=1,
+    #                     help='name of file to parse')
+    # parser.add_argument('nProcs', metavar='PROCS', type=int, nargs=1,
+    #                     help='number of processes for parsing')
+    # parser.add_argument('pixPerMm', metavar='RES', type=float, nargs=1,
+    #                     help='resolution of output volumes')
 
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
 
-    dataFolder = args.dataFolder[0] #"/Users/davidspector/Downloads/wei_test"
-    destFolder = args.destFolder[0]
-    sipFilename = args.sipFilename[0] #"SHC-PTEST001-V02-CE01_16.05.52_mf_sip_capture_50_2_1_0.raw"
-    nProcs = args.nProcs[0] #4
-    pixPerMm = args.pixPerMm[0] #1.2
+    dataFolder = "/Users/davidspector/Downloads/urgent_data" #args.dataFolder[0] 
+    destFolder = "/Users/davidspector/Downloads/urgent_data" #args.destFolder[0]
+    sipFilename = "P001-CEUS-01_13.52.23_mf_sip_capture_50_2_1_0.raw" #args.sipFilename[0]
+    nProcs = 4 #args.nProcs[0] #4
+    pixPerMm = 1.2 #args.pixPerMm[0] #1.2
     procs = []
     Example = Philips4dParser()
     volDestPath = Example.prepVolRead(dataFolder, sipFilename, destFolder, pixPerMm)
