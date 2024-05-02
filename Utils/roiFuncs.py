@@ -1,6 +1,7 @@
 from numpy import matlib
 import numpy as np
 from PIL import Image, ImageDraw
+from scipy.signal import hamming
 
 
 class RoiPositionsStruct:
@@ -406,7 +407,7 @@ def computeSpecWindowsRF(
 
         # Compute QUS parameters
         [mbfit, _, _, p, _, _] = spectralAnalysisDefault6db(nps, f, db6LowF, db6HighF)
-        # [mbfit, _, _, p, _, _] = eng.spectralAnalysisDefault6db(matlab.double(np.ascontiguousarray(nps)), matlab.double(f), matlab.double(db6LowF), matlab.double(db6HighF), matlab.double(2), nargout=6)
+        attCoef = attenuationCoeff(imgWindow, refWindow, imgSamplingFreq, p, )
         imMbf[i] = mbfit
         # imSs[i]=p[0][0]
         # imSi[i]=p[0][1]
@@ -415,3 +416,53 @@ def computeSpecWindowsRF(
 
     return imWinTopBottomDepth, imWinLeftRightWidth, imMbf, imSs, imSi, imF[0], imNps
 
+def attenuationCoeff(imRf: np.ndarray, phantRf: np.ndarray, samplingFreq: int, longl, sz: int, f: np.ndarray,
+                     initialWindowDepth: float, windowDepth) -> float:
+    """
+    Compute attenuation parameter for image and phantom rf regions. This function assumes
+    the image and phantom were captured with identical transducer and transducer settings.
+
+    Inputs:
+        imRf - 2D Numpy array of RF image window
+        phantRf - 2D Numpy array of RF phantom window
+        samplingFreq - Transducer sampling frequency of image and phantom (SAME AS FREQ NUM FOR ATT?)
+        longl - 3D Numpy array of size (num windows, 1, 1). Each value
+                conta,ins the starting pixel number for the corresponding window
+        sz - Number of pixels vertically
+        f - Frequency array
+        initialWindowDepth - Initial depth of window (PIX OR CM?)
+    Returns:
+        attCoef - Attenuation Coefficient
+    """
+
+    rf = np.array([(imRf[(i*windowDepth):(i*windowDepth)+windowDepth,(w*c):(w*c+c)]) for i in range(0,qa) for w in range(0,wlo) ])
+
+    distalWind = samplingFreq
+    zpx = 15*longl/sz
+    zds = 15*(longl+imRf.shape[1]-distalWind)/sz
+    rfpx = imRf[:,:distalWind,:]
+    rfds = imRf[:,-distalWind:,:]
+    phanpx = phantRf[:,:distalWind,:]
+    phands = phantRf[:,-distalWind:,:]
+
+
+    # TEMP (???)
+    # ap = 0.5
+
+    ham = hamming(distalWind).reshape((distalWind, 1))
+    rfPsHamPx = np.fft.fft(rfpx*ham, axis=1)
+    rfPsHamDs = np.fft.fft(rfds*ham, axis=1)
+    pPsHamPx = np.fft.fft(phanpx*ham, axis=1)
+    pPsHamDs = np.fft.fft(phands*ham, axis=1)
+
+    sHamPx = np.log(np.abs(rfPsHamPx/pPsHamPx))
+    sHamDs = np.log(np.abs(rfPsHamDs/pPsHamDs))
+    sHam = sHamPx - sHamDs
+
+    f2 = f.reshape((distalWind,1))
+    h = f2 #ap*f2 (???)
+    tepiid = (sHam/(4*(zds-zpx)))+h
+
+    attCoef = np.nanmean(np.abs([np.polyfit(f, tepiid[m],1) for m in range(imRf.shape[0])][:,0,:]), axis=1)
+
+    return attCoef
