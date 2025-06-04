@@ -21,13 +21,14 @@ from src.UtcTool2d.roiSelection_ui_helper import RoiSelectionGUI
 import src.Parsers.philips3dRf as phil3d
 
 
-def selectImageHelper(pathInput, fileExts):
-    if not os.path.exists(pathInput.text()):  # check if file path is manually typed
-        fileName, _ = QFileDialog.getOpenFileName(None, "Open File", filter=fileExts)
-        if fileName != "":  # If valid file is chosen
-            pathInput.setText(fileName)
-        else:
-            return
+def selectImageHelper(pathInput, fileExts, startDir):
+    if not Path(startDir).exists():
+        startDir = str(Path.home())
+    fileName, _ = QFileDialog.getOpenFileName(None, "Open File", filter=fileExts, directory=startDir)
+    if fileName != "":  # If valid file is chosen
+        pathInput.setText(fileName)
+    else:
+        return
 
 
 class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
@@ -36,12 +37,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.setupUi(self)
 
         self.setLayout(self.fullScreenLayout)
-        self.fullScreenLayout.removeItem(self.imgSelectionLayout)
-        self.hideImgSelectionLayout()
-        self.fullScreenLayout.removeItem(self.framePreviewLayout)
-        self.hideFramePreviewLayout()
-        self.fullScreenLayout.setStretchFactor(self.sidebarLayout, 1)
-        self.fullScreenLayout.setStretchFactor(self.parserOptionsLayout, 10)
+        self.restartChoice()
 
         self.welcomeGui: QWidget
         self.roiSelectionGUI = None
@@ -63,11 +59,38 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.clearPhantomPathButton.clicked.connect(self.clearPhantomPath)
         self.generateImageButton.clicked.connect(self.moveToRoiSelection)
         self.backButton.clicked.connect(self.backToWelcomeScreen)
+        self.backToImgSelButton.clicked.connect(self.restartChoice)
+        
+    def restartChoice(self):
+        self.fullScreenLayout.removeItem(self.imgSelectionLayout)
+        self.hideImgSelectionLayout()
+        self.fullScreenLayout.removeItem(self.framePreviewLayout)
+        self.hideFramePreviewLayout()
+        if self.parserOptionsLayout in [self.fullScreenLayout.itemAt(i) for i in range(self.fullScreenLayout.count())]:
+            self.fullScreenLayout.removeItem(self.parserOptionsLayout)
+        self.fullScreenLayout.addItem(self.parserOptionsLayout)
+        self.showParserOptionsLayout()
+        self.fullScreenLayout.setStretchFactor(self.sidebarLayout, 1)
+        self.fullScreenLayout.setStretchFactor(self.parserOptionsLayout, 10)
 
     def backToWelcomeScreen(self):
         self.welcomeGui.show()
         self.welcomeGui.resize(self.size())
         self.hide()
+        
+    def backToChoice(self):
+        self.frame = 0
+        if self.framePreviewLayout in [self.fullScreenLayout.itemAt(i) for i in range(self.fullScreenLayout.count())]:
+            self.fullScreenLayout.removeItem(self.framePreviewLayout)
+        self.hideFramePreviewLayout()
+        if self.imgSelectionLayout in [self.fullScreenLayout.itemAt(i) for i in range(self.fullScreenLayout.count())]:
+            self.fullScreenLayout.removeItem(self.imgSelectionLayout)
+        self.fullScreenLayout.addItem(self.imgSelectionLayout)
+        self.showImgSelectionLayout()
+        self.philips3dCheckBox.hide()
+        self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
+        self.generateImageButton.setText("Generate Image")
+        self.selectImageErrorMsg.hide()
         
     def hideParserOptionsLayout(self):
         self.canonButton.hide()
@@ -90,12 +113,10 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
     def hideImgSelectionLayout(self):
         self.generateImageButton.hide()
         self.choosePhantomFileButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.clearPhantomPathButton.hide()
         self.phantomPathInput.hide()
         self.phantomPathLabel.hide()
         self.chooseImageFileButton.hide()
-        self.chooseImageFolderButton.hide()
         self.clearImagePathButton.hide()
         self.imagePathInput.hide()
         self.imagePathLabel.hide()
@@ -106,12 +127,10 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
     def showImgSelectionLayout(self):
         self.generateImageButton.show()
         self.choosePhantomFileButton.show()
-        self.choosePhantomFolderButton.show()
         self.clearPhantomPathButton.show()
         self.phantomPathInput.show()
         self.phantomPathLabel.show()
         self.chooseImageFileButton.show()
-        self.chooseImageFolderButton.show()
         self.clearImagePathButton.show()
         self.imagePathInput.show()
         self.imagePathLabel.show()
@@ -124,6 +143,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.curFrameSlider.hide()
         self.curFrameLabel.hide()
         self.acceptFrameButton.hide()
+        self.backFromFramesButton.hide()
         self.imPreview.hide()
         self.selectFrameLabel.hide()
         
@@ -133,6 +153,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.curFrameSlider.show()
         self.curFrameLabel.show()
         self.acceptFrameButton.show()
+        self.backFromFramesButton.show()
         self.imPreview.show()
         self.selectFrameLabel.show()
 
@@ -153,6 +174,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
                 self.imagePathInput.text().split("/")[-1],
                 self.phantomPathInput.text().split("/")[-1],
             )
+            self.roiSelectionGUI.imagePath = Path(self.imagePathInput.text()).absolute()
             if self.machine == "Verasonics":
                 self.roiSelectionGUI.openImageVerasonics(
                     self.imagePathInput.text(), self.phantomPathInput.text()
@@ -201,6 +223,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.initialRefRf = self.refDataStruct.rf
 
         self.acceptFrameButton.clicked.connect(self.acceptSiemensFrame)
+        self.backFromFramesButton.clicked.connect(self.backToChoice)
         self.displaySlidingFrames()
         
     def openClariusImage(self):
@@ -273,6 +296,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.roiSelectionGUI.utcData = utcData
 
         self.acceptFrameButton.clicked.connect(self.acceptClariusFrame)
+        self.backFromFramesButton.clicked.connect(self.backToChoice)
         self.displaySlidingFrames()
 
     def openPhilipsImage(self):
@@ -412,8 +436,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.showImgSelectionLayout()
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
 
         self.imagePathLabel.setText("Input Path to Image file\n (.rf, .mat)")
         self.phantomPathLabel.setText("Input Path to Phantom file\n (.rf, .mat)")
@@ -427,8 +449,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
         self.showImgSelectionLayout()
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.philips3dCheckBox.hide()
 
         self.imagePathLabel.setText("Input Path to Image file\n (.mat)")
@@ -443,8 +463,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
         self.showImgSelectionLayout()
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.philips3dCheckBox.hide()
 
         self.imagePathLabel.setText("Input Path to Image file\n (.rfd)")
@@ -461,8 +479,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
         self.showImgSelectionLayout()
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.philips3dCheckBox.hide()
         
         self.imagePathLabel.setText("Input Path to Image file\n (.bin)")
@@ -477,8 +493,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
         self.showImgSelectionLayout()
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.philips3dCheckBox.hide()
         
         self.imagePathLabel.setText("Input Path to Image file\n (.raw, .tar)")
@@ -495,8 +509,6 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.fullScreenLayout.addItem(self.imgSelectionLayout)
         self.fullScreenLayout.setStretchFactor(self.imgSelectionLayout, 10)
         self.showImgSelectionLayout()
-        self.chooseImageFolderButton.hide()
-        self.choosePhantomFolderButton.hide()
         self.philips3dCheckBox.hide()
         self.phantomPathInput.hide()
         self.clearPhantomPathButton.hide()
@@ -512,11 +524,11 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
             shutil.rmtree("Junk")
         os.mkdir("Junk")
 
-        selectImageHelper(self.imagePathInput, self.fileExts)
+        selectImageHelper(self.imagePathInput, self.fileExts, str(Path(self.imagePathInput.text()).parent))
         self.selectImageErrorMsg.hide()
 
     def selectPhantomFile(self):
-        selectImageHelper(self.phantomPathInput, self.fileExts)
+        selectImageHelper(self.phantomPathInput, self.fileExts, str(Path(self.imagePathInput.text()).parent))
         self.selectImageErrorMsg.hide()
 
 

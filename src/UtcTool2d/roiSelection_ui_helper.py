@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -37,8 +38,9 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.acceptRectangleButton.clicked.connect(self.acceptRect)
         self.undoLoadedRoiButton.clicked.connect(self.undoRoiLoad)
 
-        self.loadRoiGUI = LoadRoiGUI()
-        self.saveRoiGUI = SaveRoiGUI()
+        self.loadRoiGUI: LoadRoiGUI
+        self.saveRoiGUI: SaveRoiGUI
+        self.imagePath: Path
         self.ultrasoundImage = UltrasoundImage()
         self.pointsPlottedX = []
         self.pointsPlottedY = []
@@ -65,9 +67,6 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.utcData: UtcData
         self.lastGui: SelectImageSection.SelectImageGUI_UtcTool2dIQ
 
-        # self.crosshairCursor = Cursor(
-        #     self.ax, color="gold", linewidth=0.4, useblit=True
-        # )
         self.selector = RectangleSelector(
             self.ax,
             self.drawRect,
@@ -84,13 +83,18 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.closeRoiButton.clicked.connect(self.closeInterpolation)
         self.redrawRoiButton.clicked.connect(self.undoLastRoi)
         self.acceptRoiButton.clicked.connect(self.acceptROI)
-        self.backButton.clicked.connect(self.backToWelcomeScreen)
+        self.backButton.clicked.connect(self.backToSelectionScreen)
         self.drawFreehandButton.clicked.connect(self.drawFreehandRoi)
         self.drawRectangleButton.clicked.connect(self.startDrawRectRoi)
         self.loadRoiButton.clicked.connect(self.openLoadRoiWindow)
         self.backFromFreehandButton.clicked.connect(self.backFromFreehand)
         self.backFromRectangleButton.clicked.connect(self.backFromRect)
         self.saveRoiButton.clicked.connect(self.saveRoi)
+        self.backToImgSelButton.clicked.connect(self.backToImgSelection)
+        
+    def backToImgSelection(self):
+        self.backToSelectionScreen()
+        self.lastGui.backToChoice()
         
     def hideInitialButtons(self):
         self.drawFreehandButton.hide()
@@ -146,8 +150,11 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.acceptLoadedRoiButton.show()
 
     def saveRoi(self):
-        del self.saveRoiGUI
-        self.saveRoiGUI = SaveRoiGUI()
+        try:
+            del self.saveRoiGUI
+        except AttributeError:
+            pass
+        self.saveRoiGUI = SaveRoiGUI(self.imagePath)
         self.acceptRect(moveOn=False)
         self.saveRoiGUI.splineX = self.utcData.splineX
         self.saveRoiGUI.splineY = self.utcData.splineY
@@ -163,6 +170,11 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.utcData.rectCoords = []
         
     def openLoadRoiWindow(self):
+        try:
+            del self.loadRoiGUI
+        except AttributeError:
+            pass
+        self.loadRoiGUI = LoadRoiGUI(self.imagePath)
         self.loadRoiGUI.chooseRoiGUI = self
         self.loadRoiGUI.show()
 
@@ -194,7 +206,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.hideInitialButtons()
         self.showRectButtons()
 
-    def backToWelcomeScreen(self):
+    def backToSelectionScreen(self):
         self.lastGui.show()
         self.lastGui.resize(self.size())
         self.hide()

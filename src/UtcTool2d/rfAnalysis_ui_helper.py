@@ -61,7 +61,14 @@ class RfAnalysisGUI(QWidget, Ui_rfAnalysis):
         self.displayNpsButton.clicked.connect(self.displayNps)
         self.displayNpsButton.setCheckable(True)
         self.saveConfigButton.clicked.connect(self.saveConfig)
+        self.backToImgSelButton.clicked.connect(self.backToImgSelection)
         self.updateLegend("clear")
+        
+    def backToImgSelection(self):
+        self.backToLastScreen()
+        self.lastGui.backToLastScreen()
+        self.lastGui.lastGui.backToSelectionScreen()
+        self.lastGui.lastGui.lastGui.backToChoice()
 
     def saveConfig(self):
         self.saveConfigGUI.imName = self.imagePathInput.text()

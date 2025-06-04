@@ -196,7 +196,7 @@
    </property>
    <property name="text">
     <string>Type name of new file:
-(no spaces,  must end in &quot;.pkl&quot;)</string>
+(Will be saved as .pkl file)</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -219,30 +219,6 @@
 	background-color: rgb(249, 249, 249);
 	color: black;
 }</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="fileNameErrorLabel">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>320</y>
-     <width>421</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-	color: rgb(255, 0, 23);
-	font-size: 20px;
-	background-color: rgba(255, 255, 255, 0);
-}</string>
-   </property>
-   <property name="text">
-    <string>ERROR: Filename must not contain a space
-and must end in &quot;.pkl&quot;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
