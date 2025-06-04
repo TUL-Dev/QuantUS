@@ -6,7 +6,10 @@ from pyquantus.utc import UtcData
 from src.UtcTool2d.analysisParamsSelection_ui import Ui_analysisParams
 from src.UtcTool2d.rfAnalysis_ui_helper import RfAnalysisGUI
 from src.UtcTool2d.loadConfig_ui_helper import LoadConfigGUI
-import src.UtcTool2d.roiSelection_ui_helper as RoiSelectionSection
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.UtcTool2d.roiSelection_ui_helper import RoiSelectionGUI
 
 
 class AnalysisParamsGUI(Ui_analysisParams, QWidget):
@@ -17,7 +20,7 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
 
         self.rfAnalysisGUI = RfAnalysisGUI()
         self.loadConfigGUI = LoadConfigGUI()
-        self.lastGui: RoiSelectionSection.RoiSelectionGUI
+        self.lastGui: RoiSelectionGUI
         self.utcData: UtcData
         self.frame: int
 
@@ -25,6 +28,12 @@ class AnalysisParamsGUI(Ui_analysisParams, QWidget):
         self.backButton.clicked.connect(self.backToLastScreen)
         self.singleRoiWindowButton.clicked.connect(self.singleRoiWindow)
         self.loadConfigButton.clicked.connect(self.loadConfig)
+        self.backToImgSelButton.clicked.connect(self.backToImgSelection)
+        
+    def backToImgSelection(self):
+        self.backToLastScreen()
+        self.lastGui.backToSelectionScreen()
+        self.lastGui.lastGui.backToChoice()
 
     def loadConfig(self):
         self.loadConfigGUI.analysisParamsGUI = self

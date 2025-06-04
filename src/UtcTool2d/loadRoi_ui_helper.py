@@ -7,12 +7,13 @@ from src.UtcTool2d.loadRoi_ui import Ui_loadRoi
 import src.UtcTool2d.roiSelection_ui_helper as RoiSelectionSection
 
 class LoadRoiGUI(Ui_loadRoi, QWidget):
-    def __init__(self):
+    def __init__(self, imagePath: Path):
         super().__init__()
         self.setupUi(self)
         self.chooseRoiGUI: RoiSelectionSection.RoiSelectionGUI
 
         self.wrongImageWarning.hide()
+        self.startingDirectory = str(imagePath.parent)
         self.chooseFileButton.clicked.connect(self.chooseFile)
         self.clearFileButton.clicked.connect(self.clearFile)
         self.openRoiButton.clicked.connect(self.getRoiPath)
@@ -24,7 +25,7 @@ class LoadRoiGUI(Ui_loadRoi, QWidget):
         self.chooseRoiGUI.show()
 
     def chooseFile(self):
-        fileName, _ = QFileDialog.getOpenFileName(None, "Open file", filter="*.pkl")
+        fileName, _ = QFileDialog.getOpenFileName(None, "Open file", filter="*.pkl", directory=self.startingDirectory)
         if fileName != "":
             self.roiPathInput.setText(fileName)
 
@@ -46,7 +47,7 @@ class LoadRoiGUI(Ui_loadRoi, QWidget):
             self.chooseRoiGUI.utcData.splineY = roiInfo["Spline Y"]
             self.chooseRoiGUI.plotOnCanvas()
             self.chooseRoiGUI.hideInitialButtons()
-            self.chooseRoiGUI.showFreehandedButtons()
+            self.chooseRoiGUI.showLoadedRoiButtons()
 
             self.hide()
             self.chooseRoiGUI.show()
