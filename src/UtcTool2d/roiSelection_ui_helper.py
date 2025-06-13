@@ -201,10 +201,16 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
     def drawFreehandRoi(self):
         self.hideInitialButtons()
         self.showFreehandedButtons()
+        
+        self.drawRoiButton.setChecked(True)
+        self.recordDrawRoiClicked()
 
     def startDrawRectRoi(self):
         self.hideInitialButtons()
         self.showRectButtons()
+        
+        self.userDrawRectangleButton.setChecked(True)
+        self.recordDrawRectClicked()
 
     def backToSelectionScreen(self):
         self.lastGui.show()
@@ -560,6 +566,10 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.closeRoiButton.setHidden(False)
         self.redrawRoiButton.setHidden(True)
         self.plotOnCanvas()
+        
+        if not self.drawRoiButton.isHidden():
+            self.drawRoiButton.setChecked(True)
+            self.recordDrawRoiClicked()
 
     def updateBModeSettings(
         self,
