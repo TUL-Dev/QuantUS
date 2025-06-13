@@ -222,9 +222,12 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.initialImgRf = self.imgDataStruct.rf
         self.initialRefRf = self.refDataStruct.rf
 
-        self.acceptFrameButton.clicked.connect(self.acceptSiemensFrame)
-        self.backFromFramesButton.clicked.connect(self.backToChoice)
-        self.displaySlidingFrames()
+        if self.imArray.shape[0] == 1:
+            self.acceptSiemensFrame()
+        else:
+            self.acceptFrameButton.clicked.connect(self.acceptSiemensFrame)
+            self.backFromFramesButton.clicked.connect(self.backToChoice)
+            self.displaySlidingFrames()
         
     def openClariusImage(self):
         if self.imagePathInput.text().endswith(".tar"):
@@ -273,7 +276,8 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
 
         self.imgDataStruct, self.imgInfoStruct, self.refDataStruct, self.refInfoStruct, scanConverted = clariusRfParser(
             imageRfPath, imageTgcPath, imageInfoPath,
-            phantomRfPath, phantomTgcPath, phantomInfoPath
+            phantomRfPath, phantomTgcPath, phantomInfoPath,
+            visualize=False, use_tgc=True
         )
         
         utcData = UtcData()
@@ -295,9 +299,12 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.initialRefRf = self.refDataStruct.rf
         self.roiSelectionGUI.utcData = utcData
 
-        self.acceptFrameButton.clicked.connect(self.acceptClariusFrame)
-        self.backFromFramesButton.clicked.connect(self.backToChoice)
-        self.displaySlidingFrames()
+        if self.imArray.shape[0] == 1:
+            self.acceptClariusFrame()
+        else:
+            self.acceptFrameButton.clicked.connect(self.acceptClariusFrame)
+            self.backFromFramesButton.clicked.connect(self.backToChoice)
+            self.displaySlidingFrames()
 
     def openPhilipsImage(self):
         imageFilePath = Path(self.imagePathInput.text())
@@ -395,6 +402,10 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.imgDataStruct.rf = self.initialImgRf[self.frame]
         self.refDataStruct.rf = self.initialRefRf[0]
         self.acceptFrame()
+        
+        self.roiSelectionGUI.editImageDisplayGUI.contrastVal.setValue(1)
+        self.roiSelectionGUI.editImageDisplayGUI.brightnessVal.setValue(1)
+        self.roiSelectionGUI.editImageDisplayGUI.sharpnessVal.setValue(1)
 
     def acceptClariusFrame(self):
         if hasattr(self.imgDataStruct, 'scBmode'):
@@ -407,6 +418,10 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
         self.imgDataStruct.rf = self.initialImgRf[self.frame]
         self.refDataStruct.rf = self.initialRefRf[self.frame]
         self.acceptFrame()
+        
+        self.roiSelectionGUI.editImageDisplayGUI.contrastVal.setValue(1)
+        self.roiSelectionGUI.editImageDisplayGUI.brightnessVal.setValue(1)
+        self.roiSelectionGUI.editImageDisplayGUI.sharpnessVal.setValue(1)
 
     def acceptFrame(self):
         self.roiSelectionGUI.frame = self.frame
