@@ -6,7 +6,7 @@ from scipy.signal import firwin, lfilter, hilbert
 from scipy.ndimage import correlate
 
 from pyquantus.parse.objects import DataOutputStruct, InfoStruct
-from pyquantus.parse.philipsRf import Rfdata, parseRF
+from pyquantus.parse.philipsRf import Rfdata, PhilipsRfParser
 from src.Parsers.philipsSipVolumeParser import ScParams, readSIPscVDBParams, scanConvert3dVolumeSeries, formatVolumePix
 
 def QbpFilter(rfData: np.ndarray, Fc1: float, Fc2: float, FiltOrd: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -73,7 +73,7 @@ def getVolume(rfPath: Path, sipNumOutBits: int = 8, DRlowerdB: int = 20, DRupper
     # TODO: implement handling for IQ data (see scParams.removeGapsFlag in Dave Duncan MATLAB code)
 
     #Read in the interleaved SIP volume data time series (both linear/non-linear parts) 
-    rawData = parseRF(f"{rfPath.absolute()}", 0, 2000)
+    rawData = PhilipsRfParser().parse_rf(f"{rfPath.absolute()}", 0, 2000)
 
     rfDataArr, scParams = sort3DData(rawData, scParams)
 
