@@ -109,6 +109,30 @@
      </widget>
     </item>
     <item>
+     <widget class="QPushButton" name="utc3dButton">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>51</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	color: white;
+	font-size: 16px;
+	background: rgb(90, 37, 255);
+	border-radius: 15px;
+}</string>
+      </property>
+      <property name="text">
+       <string>3D RF Data Preview</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="dceus2dButton">
       <property name="minimumSize">
        <size>

@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QWidget
 
 from src.CeusTool3d.selectImage_ui_helper import SelectImageGUI_CeusTool3d
 from src.CeusMcTool2d.selectImage_ui_helper import SelectImageGUI_CeusMcTool2d
+from src.UtcTool3d.selectImage_ui_helper import SelectImageGUI_UtcTool3d
 from src.UtcTool2d.selectImage_ui_helper import SelectImageGUI_UtcTool2dIQ
 from welcome_ui import Ui_WelcomePage
 
@@ -13,14 +14,37 @@ class WelcomeGui(Ui_WelcomePage, QWidget):
         super().__init__()
         self.setupUi(self)
         self.utc2dButton.clicked.connect(self.moveToUtc2d)
+        self.utc3dButton.clicked.connect(self.moveToUtc3d)
         self.dceus3dButton.clicked.connect(self.moveToDceus3d)
         self.dceus2dButton.clicked.connect(self.moveToDceusMc2d)
         self.nextPage = None
         self.setLayout(self.verticalLayout)
+        self.ceus2dMcData = pd.DataFrame(
+            columns=[
+                "Patient",
+                "Area Under Curve (AUC)",
+                "Peak Enhancement (PE)",
+                "Time to Peak (TP)",
+                "Mean Transit Time (MTT)",
+                "TMPPV",
+                "ROI Area (mm^2)",
+                "TIC y vals",
+                "TIC t vals",
+                "Lognorm y vals"
+            ]
+        )
 
     def moveToUtc2d(self):
         del self.nextPage
         self.nextPage = SelectImageGUI_UtcTool2dIQ()
+        self.nextPage.show()
+        self.nextPage.resize(self.size())
+        self.nextPage.welcomeGui = self
+        self.hide()
+
+    def moveToUtc3d(self):
+        del self.nextPage
+        self.nextPage = SelectImageGUI_UtcTool3d()
         self.nextPage.show()
         self.nextPage.resize(self.size())
         self.nextPage.welcomeGui = self
@@ -37,6 +61,7 @@ class WelcomeGui(Ui_WelcomePage, QWidget):
     def moveToDceusMc2d(self):
         del self.nextPage
         self.nextPage = SelectImageGUI_CeusMcTool2d()
+        self.nextPage.dataFrame = self.ceus2dMcData
         self.nextPage.show()
         self.nextPage.welcomeGui = self
         self.hide()
