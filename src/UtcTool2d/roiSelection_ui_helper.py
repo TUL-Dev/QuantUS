@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from tkinter import N
 
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -8,6 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import scipy.interpolate as interpolate
 from matplotlib.widgets import RectangleSelector, Cursor
 import matplotlib.patches as patches
+from scipy.io import savemat
 
 from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from PyQt6.QtGui import QImage
@@ -60,6 +62,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
             self.changeBrightness
         )
         self.editImageDisplayGUI.sharpnessVal.valueChanged.connect(self.changeSharpness)
+        self.matlabExportButton.setStyleSheet("QPushButton { color:white; font-size: 16px; background: rgb(90, 37, 255); border-radius: 15px; }")
 
         self.analysisParamsGUI = AnalysisParamsGUI()
 
@@ -91,6 +94,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
         self.backFromRectangleButton.clicked.connect(self.backFromRect)
         self.saveRoiButton.clicked.connect(self.saveRoi)
         self.backToImgSelButton.clicked.connect(self.backToImgSelection)
+        self.matlabExportButton.clicked.connect(self.saveToMat)
         
     def backToImgSelection(self):
         self.backToSelectionScreen()
@@ -148,6 +152,24 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
     def showLoadedRoiButtons(self):
         self.undoLoadedRoiButton.show()
         self.acceptLoadedRoiButton.show()
+
+    def saveToMat(self):
+        outDict = {
+            "Sampling_Frequency": self.utcData.utcAnalysis.config.samplingFrequency,
+            "Center_Frequency": self.utcData.utcAnalysis.config.centerFrequency,
+            "Transducer_Frequency_Band": np.array(self.utcData.utcAnalysis.config.transducerFreqBand),
+            "Analysis_Frequency_Band": np.array(self.utcData.utcAnalysis.config.analysisFreqBand),
+            "Bmode": self.ultrasoundImage.bmode,
+            "RF": self.ultrasoundImage.rf,
+            "Phantom_RF": self.ultrasoundImage.phantomRf,
+        }
+        if hasattr(self.utcData, 'scBmode'):
+            outDict["SC_Bmode"] = self.ultrasoundImage.scBmode
+        
+        savemat(self.imagePath.with_suffix(".mat"), outDict)
+        self.matlabExportButton.setText("Saved to .mat!")
+        self.matlabExportButton.clicked.disconnect()
+        self.matlabExportButton.setStyleSheet("QPushButton { color:white; font-size: 16px; background: rgb(45, 0, 110); border-radius: 15px; }")
 
     def saveRoi(self):
         try:
