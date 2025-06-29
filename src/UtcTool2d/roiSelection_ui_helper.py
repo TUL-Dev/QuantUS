@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from tkinter import N
 
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -61,6 +62,7 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
             self.changeBrightness
         )
         self.editImageDisplayGUI.sharpnessVal.valueChanged.connect(self.changeSharpness)
+        self.matlabExportButton.setStyleSheet("QPushButton { color:white; font-size: 16px; background: rgb(90, 37, 255); border-radius: 15px; }")
 
         self.analysisParamsGUI = AnalysisParamsGUI()
 
@@ -153,18 +155,21 @@ class RoiSelectionGUI(QWidget, Ui_constructRoi):
 
     def saveToMat(self):
         outDict = {
-            "Sampling Frequency": self.utcData.utcAnalysis.config.samplingFrequency,
-            "Center Frequency": self.utcData.utcAnalysis.config.centerFrequency,
-            "Transducer Frequency Band": self.utcData.utcAnalysis.config.transducerFreqBand,
-            "Analysis Frequency Band": self.utcData.utcAnalysis.config.analysisFreqBand,
+            "Sampling_Frequency": self.utcData.utcAnalysis.config.samplingFrequency,
+            "Center_Frequency": self.utcData.utcAnalysis.config.centerFrequency,
+            "Transducer_Frequency_Band": np.array(self.utcData.utcAnalysis.config.transducerFreqBand),
+            "Analysis_Frequency_Band": np.array(self.utcData.utcAnalysis.config.analysisFreqBand),
             "Bmode": self.ultrasoundImage.bmode,
             "RF": self.ultrasoundImage.rf,
-            "Phantom RF": self.ultrasoundImage.phantomRf,
+            "Phantom_RF": self.ultrasoundImage.phantomRf,
         }
-        if hasattr(self.utcData.scBmode):
-            outDict["scBmode"] = self.ultrasoundImage.scBmode
+        if hasattr(self.utcData, 'scBmode'):
+            outDict["SC_Bmode"] = self.ultrasoundImage.scBmode
         
         savemat(self.imagePath.with_suffix(".mat"), outDict)
+        self.matlabExportButton.setText("Saved to .mat!")
+        self.matlabExportButton.clicked.disconnect()
+        self.matlabExportButton.setStyleSheet("QPushButton { color:white; font-size: 16px; background: rgb(45, 0, 110); border-radius: 15px; }")
 
     def saveRoi(self):
         try:
