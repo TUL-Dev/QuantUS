@@ -31,3 +31,17 @@ pyuic6 src/UtcTool2d/analysisParamsSelection.ui -o src/UtcTool2d/analysisParamsS
 pyuic6 src/UtcTool2d/psGraphDisplay.ui -o src/UtcTool2d/psGraphDisplay_ui.py
 pyuic6 src/UtcTool2d/saveConfig.ui -o src/UtcTool2d/saveConfig_ui.py
 pyuic6 src/UtcTool2d/loadConfig.ui -o src/UtcTool2d/loadConfig_ui.py
+
+pyuic6 src/UtcTool3d/selectImage.ui -o src/UtcTool3d/selectImage_ui.py
+pyuic6 src/UtcTool3d/loadingScreen.ui -o src/UtcTool3d/loadingScreen_ui.py
+# pyuic6 src/UtcTool3d/windowsTooLarge.ui -o src/UtcTool3d/windowsTooLarge_ui.py
+pyuic6 src/UtcTool3d/saveVoi.ui -o src/UtcTool3d/saveVoi_ui.py
+pyuic6 src/UtcTool3d/voiSelection.ui -o src/UtcTool3d/voiSelection_ui.py
+# pyuic6 src/UtcTool3d/rfAnalysis.ui -o src/UtcTool3d/rfAnalysis_ui.py
+# pyuic6 src/UtcTool3d/loadRoi.ui -o src/UtcTool3d/loadRoi_ui.py
+# pyuic6 src/UtcTool3d/exportData.ui -o src/UtcTool3d/exportData_ui.py
+# pyuic6 src/UtcTool3d/editImageDisplay.ui -o src/UtcTool3d/editImageDisplay_ui.py
+# pyuic6 src/UtcTool3d/analysisParamsSelection.ui -o src/UtcTool3d/analysisParamsSelection_ui.py
+# pyuic6 src/UtcTool3d/psGraphDisplay.ui -o src/UtcTool3d/psGraphDisplay_ui.py
+# pyuic6 src/UtcTool3d/saveConfig.ui -o src/UtcTool3d/saveConfig_ui.py
+# pyuic6 src/UtcTool3d/loadConfig.ui -o src/UtcTool3d/loadConfig_ui.py
