@@ -189,6 +189,7 @@ def readSIP3dInterleavedV5(filename, numberOfPlanes=32, numberOfParams=5):
     param = SipVolParams()
     img = SipVolDataStruct()
     linImageList = []; nLinImageList = []
+    numberOfPlanes=11
     while (True):
         tmpLine = np.fromfile(file, count=numberOfParams, dtype='<u4')
         
