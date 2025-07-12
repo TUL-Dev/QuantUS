@@ -158,7 +158,7 @@ class SelectImageGUI_CeusMcTool2d(Ui_selectImage, QWidget):
         self.clearSpreadsheetFileButton.setHidden(False)
         self.spreadsheetPath.setHidden(False)
         self.selectSpreadsheeetLabel.setHidden(False)
-        self.selectSpreadsheeetLabel.setText("Select DICOM Image (.dcm)")
+        self.selectSpreadsheeetLabel.setText("Select DICOM Image")
 
         self.format = "DicomDirect"
         self.findImagesButton.clicked.connect(self.moveToRoiSelection)
@@ -207,7 +207,6 @@ class SelectImageGUI_CeusMcTool2d(Ui_selectImage, QWidget):
                         self.xcelIndices.append(i)
                 except (AttributeError, NameError, IndexError):
                     continue
-            # self.scans = [str(scan).split('/')[-1][:-4] for scan in scans]
 
             self.imagesScrollArea.setHidden(False)
             self.selectSpreadsheeetLabel.setHidden(True)
@@ -258,7 +257,7 @@ class SelectImageGUI_CeusMcTool2d(Ui_selectImage, QWidget):
         if self.format == "DicomExcel":
             fileName, _ = QFileDialog.getOpenFileName(None, "Open File", filter="*.xlsx")
         else:
-            fileName, _ = QFileDialog.getOpenFileName(None, "Open File", filter="*.dcm, *.DCM")
+            fileName, _ = QFileDialog.getOpenFileName(None, "Open File", filter="*.dcm *.DCM *")
         if fileName != "":
             self.spreadsheetPath.setText(fileName)
 
@@ -278,10 +277,6 @@ class SelectImageGUI_CeusMcTool2d(Ui_selectImage, QWidget):
             or (len(self.aviPath.text()) > 0)
             or (
                 os.path.exists(self.spreadsheetPath.text())
-                and (
-                    self.spreadsheetPath.text().endswith('.dcm')
-                    or self.spreadsheetPath.text().endswith('.DCM')
-                )
             )
         ):
             del self.roiSelectionGui
