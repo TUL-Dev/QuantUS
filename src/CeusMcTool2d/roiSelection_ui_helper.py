@@ -89,16 +89,10 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
             pass
         self.saveRoiGUI = SaveRoiGUI()
         self.saveRoiGUI.roiSelectionGUI = self
-        dir, filename = os.path.split(self.fullPath)
-        ext = os.path.splitext(self.fullPath)[-1]
-        filename = filename[: (-1 * len(ext))]
-        if filename.endswith(".nii"):
-            filename = filename[:-4]
-        path = os.path.join(dir, "nifti_segmentation_QUANTUS")
-        self.saveRoiGUI.newFolderPathInput.setText(path)
-        self.saveRoiGUI.newFileNameInput.setText(str(filename + ".nii.gz"))
-        if not os.path.exists(path):
-            os.mkdir(path)
+        default_roi_path = Path(self.fullPath).parent / "nifti_segmentation_QUANTUS"
+        default_roi_path.mkdir(parents=True, exist_ok=True)
+        self.saveRoiGUI.newFolderPathInput.setText(str(default_roi_path))
+        self.saveRoiGUI.newFileNameInput.setText(Path(self.fullPath).with_suffix('.nii.gz').name.replace(' ', '_'))
         self.saveRoiGUI.show()
 
     def saveRoi(self, fileDestination, name):  # frame):
@@ -1187,22 +1181,11 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
             xBuffer = int(emptySpace / 2)
             self.imX0 += xBuffer
             self.imX1 -= xBuffer
-
-        self.loadRoiButton.setHidden(True)
-        self.newRoiButton.setHidden(True)
-        self.defImBoundsButton.setHidden(False)
-        self.defImBoundsButton.clicked.connect(self.startBoundDef)
+        
         self.cineRate = ds.CineRate
-
         self.imCoverPixmap = QPixmap(self.widthScale, self.depthScale)
         self.imCoverPixmap.fill(Qt.GlobalColor.transparent)
         self.imCoverLabel.setPixmap(self.imCoverPixmap)
-
-        self.curLeftLineX = 0
-        self.curRightLineX = self.widthScale - 1
-        self.curTopLineY = 0
-        self.curBottomLineY = self.depthScale - 1
-        #########################################################
 
         self.sliceArray = np.round(
             [i * (1 / self.cineRate) for i in range(self.numSlices)], decimals=2
@@ -1210,7 +1193,6 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
         self.maskCoverImg = np.zeros([self.y, self.x, 4])
         self.curSliceSlider.setMaximum(self.numSlices - 1)
         self.curSliceSpinBox.setMaximum(self.numSlices - 1)
-
         self.curSliceTotal.setText(str(self.numSlices - 1))
 
         self.curSliceSpinBox.setValue(self.curFrameIndex)
@@ -1231,6 +1213,29 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
 
         self.redrawRoiButton.clicked.connect(self.undoLastRoi)
         self.drawRoiButton.clicked.connect(self.startRoiDraw)
+        
+        if hasattr(ds, 'SequenceOfUltrasoundRegions') and len(ds.SequenceOfUltrasoundRegions) >= 2 \
+            and hasattr(ds.SequenceOfUltrasoundRegions[0], 'RegionLocationMinX0'):
+            self.x0_CE = ds.SequenceOfUltrasoundRegions[0].RegionLocationMinX0
+            self.y0_CE = ds.SequenceOfUltrasoundRegions[0].RegionLocationMinY0
+            self.w_CE = ds.SequenceOfUltrasoundRegions[0].RegionLocationMaxX1 - self.x0_CE
+            self.h_CE = ds.SequenceOfUltrasoundRegions[0].RegionLocationMaxY1 - self.y0_CE
+            self.x0_bmode = ds.SequenceOfUltrasoundRegions[1].RegionLocationMinX0
+            self.y0_bmode = ds.SequenceOfUltrasoundRegions[1].RegionLocationMinY0
+            self.w_bmode = ds.SequenceOfUltrasoundRegions[1].RegionLocationMaxX1 - self.x0_bmode
+            self.h_bmode = ds.SequenceOfUltrasoundRegions[1].RegionLocationMaxY1 - self.y0_bmode
+            self.moveToAnalysis(preloaded_bounds=True)
+            
+        else:
+            self.loadRoiButton.setHidden(True)
+            self.newRoiButton.setHidden(True)
+            self.defImBoundsButton.setHidden(False)
+            self.defImBoundsButton.clicked.connect(self.startBoundDef)
+            
+            self.curLeftLineX = 0
+            self.curRightLineX = self.widthScale - 1
+            self.curTopLineY = 0
+            self.curBottomLineY = self.depthScale - 1
 
     def updateBoundLines(self, line):
         canvas = self.imCoverLabel.pixmap()
@@ -1490,13 +1495,8 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
         self.boundBackButton.clicked.connect(self.acceptBmode)
         self.horizontalSlider.setValue(self.y0_CE)
         self.verticalContrastChanged()
-
-    def moveToAnalysis(self):
-        canvas = self.imCoverLabel.pixmap()
-        painter = QPainter(canvas)
-        canvas.fill(Qt.GlobalColor.transparent)
-        self.imCoverLabel.pixmap().fill(Qt.GlobalColor.transparent)
-        painter.setPen(Qt.GlobalColor.yellow)
+        
+    def update_bound_lines(self):
         xScale = self.widthScale / self.x
         yScale = self.depthScale / self.y
         self.x0_bmode = int(self.x0_bmode / xScale)
@@ -1507,6 +1507,19 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
         self.h_bmode = int(self.h_bmode / yScale)
         self.w_CE = int(self.w_CE / xScale)
         self.h_CE = int(self.h_CE / yScale)
+
+    def moveToAnalysis(self, preloaded_bounds=False):
+        canvas = self.imCoverLabel.pixmap()
+        painter = QPainter(canvas)
+        canvas.fill(Qt.GlobalColor.transparent)
+        self.imCoverLabel.pixmap().fill(Qt.GlobalColor.transparent)
+        painter.setPen(Qt.GlobalColor.yellow)
+        xScale = self.widthScale / self.x
+        yScale = self.depthScale / self.y
+        
+        if not preloaded_bounds:
+            self.update_bound_lines()
+            
         self.bmodeStartX = self.imX0 + int(xScale * self.x0_bmode)
         self.bmodeEndX = self.bmodeStartX + int(xScale * self.w_bmode)
         self.bmodeStartY = self.imY0 + int(yScale * self.y0_bmode)
@@ -1515,6 +1528,7 @@ class RoiSelectionGUI(Ui_constructRoi, QWidget):
         self.ceEndX = self.ceStartX + int(xScale * self.w_CE)
         self.ceStartY = self.imY0 + int(yScale * self.y0_CE)
         self.ceEndY = self.ceStartY + int(yScale * self.h_CE)
+        
         if self.x0_bmode >= 0 and self.y0_bmode >= 0 and self.w_bmode > 0 and self.h_bmode > 0:
             painter.drawRect(
                 int(self.x0_bmode * xScale),
@@ -2009,9 +2023,12 @@ def load_cine(cine_array, color_channel):
     """
     if "YBR_FULL" in color_channel:
         if color_channel == "YBR_FULL" or color_channel == "YBR_FULL_422":
-            cine_array = convert_color_space(
-                cine_array, color_channel, "RGB", per_frame=True
-            )
+            if cine_array.shape[-1] == 3:
+                pass
+            else:
+                cine_array = convert_color_space(
+                    cine_array, color_channel, "RGB", per_frame=True
+                )
         else:
             # swap YBR to YRB first
             cine_array[:, :, :, :] = cine_array[:, :, :, [0, 2, 1]]
