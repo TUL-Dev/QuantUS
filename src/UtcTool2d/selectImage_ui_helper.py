@@ -221,6 +221,7 @@ class SelectImageGUI_UtcTool2dIQ(Ui_selectImage, QWidget):
             imageFilePath, phantomFilePath)
         self.initialImgRf = self.imgDataStruct.rf
         self.initialRefRf = self.refDataStruct.rf
+        self.frame = 0
 
         if self.imArray.shape[0] == 1:
             self.acceptSiemensFrame()
