@@ -246,6 +246,8 @@ class VoiSelectionGUI(Ui_constructVoi, QWidget):
     def backToLastScreen(self):
         self.lastGui.timeconst = None
         self.lastGui.hideFrameRateLabels()
+        self.lastGui.imagePath = ""
+        self.lastGui.bmodeImagePath = ""
         self.lastGui.show()
         self.lastGui.resize(self.size())
         self.hide()
