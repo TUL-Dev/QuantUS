@@ -942,7 +942,6 @@ class VoiSelectionGUI(Ui_constructVoi, QWidget):
                     list(chain.from_iterable(pointsPlotted))
                 )
             elif len(self.planesDrawn) == 2:
-                print("shit")
                 return
             else:
                 points = set()
