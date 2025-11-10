@@ -8,7 +8,6 @@ The QuantUS GUI follows a modified MVC pattern with additional coordinator compo
 
 ```
 src/qus/
-├── main.py                    # Application entry point
 ├── application_controller.py  # Main application controller
 ├── application_model.py       # Unified application model
 ├── mvc/                       # Base MVC framework

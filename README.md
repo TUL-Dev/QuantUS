@@ -8,7 +8,7 @@ QuantUS is an open-source quantitative analysis tool designed for ultrasonic tis
 
 Currently developed backends support quantitative ultrasound (QUS) backscatter analysis and dynamic contrast-enhanced ultrasound (CEUS) perfusion imaging analysis in both 2D and 3D. However, the plugin-based architecture allows for easy extension to additional QUS methods and analysis types in the future.
 
-Note that the GUI in this repository is incomplete. Specifically, the QUS GUI does not support numerical data exporting and the CEUS GUI only supports segmentation. More information about each backend can be found in their respective repositories. Also, support for batch processing is exclusively supported in the backend repositories at this time.
+Note that the GUI in this repository is incomplete. Specifically, the QUS GUI does not support numerical data exporting and the CEUS GUI only supports manual segmentation (i.e. no viewing of pre-existing segmentations, no analysis, no visualizations). Please refer to the legacy version of the QuantUS GUI for more complete frontend support. More information about each backend can be found in their respective repositories. Also, support for batch processing is exclusively supported in the backend repositories at this time.
 
 ## Installation
 
@@ -38,7 +38,7 @@ To run the GUI, use
 ```shell
 source .venv/bin/activate                           # Unix
 .venv\Scripts\activate                              # Windows (cmd)
-python main.py
+python qus_gui.py | ceus_gui.py                     # Run QUS or CEUS GUI
 ```
 
 ### Keeping your version up to date
@@ -53,6 +53,8 @@ git submodule update --remote --merge
 
 ### Remaining things to do for this repository
 
+- [ ] Merge QuantUS-Plugins PR to main and update submodule reference here.
+- [ ] Move all QuantUS repos to a new "QuantUS" organization on Github.
 - [ ] Support plugin inputs from the GUI directly. Since we're using submodules,
         we don't want users copying and pasting files directly into the backend.
         Thus, there should be a new folder `engines/plugins` which can contain all
