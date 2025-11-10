@@ -60,7 +60,6 @@ git submodule update --remote --merge
         Thus, there should be a new folder `engines/plugins` which can contain all
         plugin-related files and resources. Note each backend will need to be modified
         to look for plugins in this new folder.
-- [ ] Test all GUI features to ensure they work as expected.
 - [ ] Use Github Actions to automatically update the submodules to their latest versions
         on a regular basis (e.g., weekly, daily, or whenever a commit is completed via webhook).
 - [ ] Implement all missing GUI features from Legacy QuantUS. This won't be trivial as
