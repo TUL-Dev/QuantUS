@@ -1,0 +1,4 @@
+[submodule "engines/qus"]
+	path = engines/qus
+	url = https://github.com/TUL-Dev/QuantUS-Plugins.git
+	branch = gui_refactor_dev
