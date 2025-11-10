@@ -5,7 +5,7 @@ This replaces the original main.py with a clean MVC-based implementation
 that provides better separation of concerns and maintainability.
 """
 
-from src.application_controller import create_application
+from src.qus.application_controller import create_application
 
 
 def main():
