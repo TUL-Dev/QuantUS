@@ -1,4 +1,4 @@
-# QuantUS GUI Module
+# QuantUS GUI Module for QUS
 
 This directory contains the Qt-based graphical user interface for QuantUS, built using a Model-View-Controller (MVC) architecture with specialized coordinators for managing complex workflows. The GUI provides an intuitive interface for ultrasound tissue characterization analysis while maintaining clean separation between UI logic and backend functionality.
 
@@ -7,7 +7,7 @@ This directory contains the Qt-based graphical user interface for QuantUS, built
 The QuantUS GUI follows a modified MVC pattern with additional coordinator components to manage complex multi-step workflows:
 
 ```
-quantus/gui/
+src/qus/
 ├── main.py                    # Application entry point
 ├── application_controller.py  # Main application controller
 ├── application_model.py       # Unified application model
