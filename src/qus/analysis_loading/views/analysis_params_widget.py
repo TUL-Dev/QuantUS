@@ -208,9 +208,17 @@ class AnalysisParamsWidget(QWidget, BaseViewMixin):
             spin_box.setStyleSheet(self._get_input_style())
             return spin_box
         elif type(default_val) == float:
+            # Use scientific notation for very small or very large values
+            abs_val = abs(default_val)
+            if abs_val != 0 and (abs_val < 1e-3 or abs_val >= 1e4):
+                line_edit = QLineEdit()
+                line_edit.setText(f"{default_val:.6e}")
+                line_edit.setStyleSheet(self._get_input_style())
+                return line_edit
+
             spin_box = QDoubleSpinBox()
             spin_box.setRange(-1000000.0, 1000000.0)
-            spin_box.setDecimals(6)
+            spin_box.setDecimals(12)
             spin_box.setSingleStep(0.1)
             spin_box.setValue(float(default_val))
             spin_box.setStyleSheet(self._get_input_style())
@@ -275,10 +283,17 @@ class AnalysisParamsWidget(QWidget, BaseViewMixin):
         for param_name, input_widget in self._param_inputs.items():
             try:
                 if isinstance(input_widget, QLineEdit):
-                    value = input_widget.text()
+                    value = input_widget.text().strip()
                     # Try to convert to number if possible
                     try:
-                        value = float(value) if '.' in value else int(value)
+                        if value == "":
+                            pass
+                        elif any(ch in value.lower() for ch in ('e',)):
+                            value = float(value)
+                        elif '.' in value:
+                            value = float(value)
+                        else:
+                            value = int(value)
                     except ValueError:
                         pass  # Keep as string
                         
